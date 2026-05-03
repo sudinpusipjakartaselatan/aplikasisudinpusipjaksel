@@ -3,9 +3,10 @@ import { getArticleById } from '@/lib/db';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const article = getArticleById(params.id);
+  const { id } = await params;
+  const article = getArticleById(id);
   if (!article) {
     return NextResponse.json({ error: 'Article not found' }, { status: 404 });
   }
