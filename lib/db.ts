@@ -15,6 +15,7 @@ export interface Article {
 
 export const getArticles = (): Article[] => {
   try {
+    if (!fs.existsSync(DB_PATH)) return [];
     const data = fs.readFileSync(DB_PATH, 'utf8');
     return JSON.parse(data);
   } catch (error) {
@@ -25,6 +26,12 @@ export const getArticles = (): Article[] => {
 
 export const saveArticles = (articles: Article[]) => {
   try {
+    // Vercel has a read-only file system. 
+    // This will only work in local development or platforms with persistent FS.
+    if (process.env.VERCEL) {
+      console.warn('Cannot save articles on Vercel (Read-only File System)');
+      return false;
+    }
     fs.writeFileSync(DB_PATH, JSON.stringify(articles, null, 2), 'utf8');
     return true;
   } catch (error) {
@@ -44,7 +51,7 @@ export const addArticle = (article: Omit<Article, 'id'>) => {
     ...article,
     id: Date.now().toString(),
   };
-  articles.unshift(newArticle); // Add to beginning
-  saveArticles(articles);
-  return newArticle;
+  articles.unshift(newArticle);
+  const success = saveArticles(articles);
+  return success ? newArticle : null;
 };
