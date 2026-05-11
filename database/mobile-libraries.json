@@ -1,0 +1,110 @@
+[
+  {
+    "id": "1778531200000",
+    "title": "Kunjungan Pusling RPTRA Taman Lenteng Agung",
+    "date": "01 September 2026",
+    "time": "09:00 - 14:00 WIB",
+    "location": "RPTRA Taman Lenteng Agung, Jakarta Selatan",
+    "imageUrl": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800",
+    "description": "Armada Pusling 1 akan hadir membawa koleksi buku fiksi remaja terbaru dan buku anak bergambar. Akan ada aktivitas mewarnai bersama kakak relawan."
+  },
+  {
+    "id": "1778531200001",
+    "title": "Layanan Literasi SDN 01 Pondok Labu",
+    "date": "03 September 2026",
+    "time": "08:00 - 12:00 WIB",
+    "location": "Halaman Utama SDN 01 Pondok Labu",
+    "imageUrl": "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800",
+    "description": "Kunjungan khusus sekolah. Membawa 500+ eksemplar ensiklopedia dan buku sains tingkat dasar. Dibuka juga untuk wali murid."
+  },
+  {
+    "id": "1778531200002",
+    "title": "Pusling Akhir Pekan: Taman Spatodea",
+    "date": "05 September 2026",
+    "time": "15:00 - 18:00 WIB",
+    "location": "Taman Spatodea, Jagakarsa",
+    "imageUrl": "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=800",
+    "description": "Habiskan akhir pekan yang produktif di taman. Pusling akan siaga sore hari dengan buku bacaan santai, novel, dan majalah keluarga."
+  },
+  {
+    "id": "1778531200003",
+    "title": "Kunjungan Literasi Kelurahan Kebayoran Baru",
+    "date": "08 September 2026",
+    "time": "09:00 - 15:00 WIB",
+    "location": "Halaman Kantor Kelurahan Kebayoran Baru",
+    "imageUrl": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&q=80&w=800",
+    "description": "Layanan peminjaman dan pengembalian buku di kawasan Kebayoran Baru. Kami juga membuka pendaftaran anggota perpustakaan secara gratis."
+  },
+  {
+    "id": "1778531200004",
+    "title": "Layanan Spesial: Panti Asuhan Yatim Piatu Al-Kautsar",
+    "date": "10 September 2026",
+    "time": "14:00 - 17:00 WIB",
+    "location": "Panti Asuhan Al-Kautsar, Pesanggrahan",
+    "imageUrl": "https://images.unsplash.com/photo-1511629091441-ee46146481b6?auto=format&fit=crop&q=80&w=800",
+    "description": "Kegiatan sosial berbagi cerita dan literasi edukatif bersama anak-anak panti asuhan. Disertai pemberian donasi buku bacaan gratis."
+  },
+  {
+    "id": "1778531200005",
+    "title": "Pusling Ceria: Lapangan Blok S",
+    "date": "12 September 2026",
+    "time": "07:00 - 11:00 WIB",
+    "location": "Sentra Kuliner dan Olahraga Lapangan Blok S",
+    "imageUrl": "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&q=80&w=800",
+    "description": "Sambil berolahraga di hari libur, sempatkan mampir ke lapak perpustakaan keliling kami. Tersedia aneka bacaan gaya hidup dan kesehatan."
+  },
+  {
+    "id": "1778531200006",
+    "title": "Kunjungan Literasi Remaja SMPN 12 Jakarta",
+    "date": "15 September 2026",
+    "time": "09:00 - 13:00 WIB",
+    "location": "Halaman Upacara SMPN 12 Kebayoran Baru",
+    "imageUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800",
+    "description": "Kunjungan khusus armada besar dengan fasilitas e-library dan PC internet. Siswa dapat mengakses jurnal pendidikan dan e-book gratis."
+  },
+  {
+    "id": "1778531200007",
+    "title": "Pusling di RPTRA Bahari, Cilandak",
+    "date": "17 September 2026",
+    "time": "15:00 - 17:30 WIB",
+    "location": "Ruang Publik Terpadu Ramah Anak (RPTRA) Bahari",
+    "imageUrl": "https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=800",
+    "description": "Tersedia area baca lesehan karpet untuk anak-anak balita dan paud. Dilengkapi mainan edukatif susun balok dan panggung boneka mini."
+  },
+  {
+    "id": "1778531200008",
+    "title": "Literasi Sore: Taman Ayodya",
+    "date": "19 September 2026",
+    "time": "16:00 - 19:00 WIB",
+    "location": "Plaza Air Mancur Taman Ayodya, Blok M",
+    "imageUrl": "https://images.unsplash.com/photo-1493770348161-369560ae357d?auto=format&fit=crop&q=80&w=800",
+    "description": "Nikmati bacaan ringan dari buku puisi, kumpulan cerpen, hingga komik. Suasana taman kota yang sejuk sangat cocok untuk kegiatan membaca."
+  },
+  {
+    "id": "1778531200009",
+    "title": "Kunjungan Komplek Perumahan Kalibata",
+    "date": "22 September 2026",
+    "time": "08:00 - 12:00 WIB",
+    "location": "Balai Warga Komplek Kalibata",
+    "imageUrl": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800",
+    "description": "Menjangkau langsung pemukiman padat penduduk. Memberikan layanan pinjam-kembali buku resep memasak, tips berkebun, dan majalah bisnis."
+  },
+  {
+    "id": "1778531200010",
+    "title": "Pusling Siaga: Pasar Minggu",
+    "date": "25 September 2026",
+    "time": "09:00 - 14:00 WIB",
+    "location": "Area Parkir Timur Pasar Minggu",
+    "imageUrl": "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&q=80&w=800",
+    "description": "Sasaran utama adalah anak-anak pedagang pasar dan para pengunjung. Menyediakan wahana membaca yang nyaman di tengah keramaian."
+  },
+  {
+    "id": "1778531200011",
+    "title": "Edukasi Dini: TK AL-Azhar Syifa Budi",
+    "date": "28 September 2026",
+    "time": "08:00 - 10:30 WIB",
+    "location": "Taman Bermain TK Al-Azhar Syifa Budi, Kemang",
+    "imageUrl": "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&q=80&w=800",
+    "description": "Fokus pada koleksi buku 3D (Pop-up), buku sensori, dan buku suara. Petugas pusling akan membacakan dongeng cerita hewan (fabel)."
+  }
+]

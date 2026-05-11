@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --primary: #003366;
   --primary-light: #0055A4;
+  --heading-text: #003366;
   --secondary: #FFD700;
   --accent: #FF8C00;
   --background: #fcfcfc;
@@ -18,9 +21,27 @@
   --glass-blur: blur(12px);
 }
 
+.dark {
+  --primary: #004080;
+  --primary-light: #0055A4;
+  --heading-text: #ffffff;
+  --secondary: #FFD700;
+  --accent: #FF8C00;
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+  --glass: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
+  --color-heading-text: var(--heading-text);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
   --color-background: var(--background);

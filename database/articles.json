@@ -1,65 +1,110 @@
 [
   {
-    "title": "Pemberitahuan Layanan Baru 2024",
-    "category": "Event",
-    "date": "3 Mei 2026",
-    "excerpt": "Layanan baru untuk warga Jakarta Selatan.",
-    "content": "Isi detail layanan baru...",
-    "imageUrl": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=800",
-    "id": "1777783890860"
-  },
-  {
-    "id": "1",
-    "title": "Fun Literacy: Mengajak Anak Mengenal Dunia Melalui Buku",
+    "id": "1778531200000",
+    "title": "Peningkatan Literasi di Era Digital: Peran Perpustakaan Modern",
     "category": "Literasi",
-    "date": "28 April 2024",
-    "excerpt": "Sudin Pusip Jakarta Selatan kembali menggelar kegiatan Fun Literacy di berbagai kelurahan untuk menumbuhkan minat baca sejak dini bagi anak-anak usia sekolah.",
-    "content": "Jakarta Selatan – Suku Dinas Perpustakaan dan Kearsipan (Sudin Pusip) Jakarta Selatan terus berupaya menumbuhkan minat baca di kalangan anak-anak melalui program unggulan 'Fun Literacy'. Kegiatan ini dilaksanakan secara rutin di berbagai RPTRA dan titik baca yang tersebar di wilayah Jakarta Selatan.\n\nDalam kegiatan ini, anak-anak diajak untuk mendengarkan dongeng, mewarnai, serta mengeksplorasi buku-buku bacaan yang menarik. Program ini bertujuan untuk memberikan pengalaman menyenangkan saat berinteraksi dengan buku, sehingga membaca tidak lagi dianggap sebagai beban melainkan kegiatan yang mengasyikkan.\n\nKepala Sudin Pusip Jakarta Selatan menyatakan bahwa literasi adalah fondasi penting bagi masa depan generasi muda. Dengan menanamkan kecintaan membaca sejak dini, diharapkan anak-anak akan tumbuh menjadi individu yang kritis dan berwawasan luas.",
+    "date": "20 Agustus 2026",
+    "excerpt": "Perpustakaan modern dituntut untuk beradaptasi dengan perkembangan teknologi dalam meningkatkan minat baca.",
+    "content": "Perpustakaan modern tidak lagi sekadar menjadi tempat penyimpanan buku fisik. Dengan pesatnya kemajuan teknologi informasi, peran perpustakaan harus berevolusi menjadi pusat pembelajaran digital. Sudin Pusip Jakarta Selatan terus mengupayakan integrasi koleksi e-book, jurnal online, dan fasilitas komputer yang memadai agar masyarakat bisa mengakses informasi tanpa batas ruang dan waktu.",
     "imageUrl": "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=800"
   },
   {
-    "id": "2",
-    "title": "Layanan LASIGA: Penyelamatan Arsip Keluarga Pasca Bencana",
-    "category": "Kearsipan",
-    "date": "25 April 2024",
-    "excerpt": "Masyarakat yang memiliki arsip penting yang rusak akibat banjir dapat memanfaatkan layanan restorasi arsip gratis yang disediakan oleh Sudin Pusip Jakarta Selatan.",
-    "content": "Jakarta Selatan – Sudin Pusip Jakarta Selatan menyediakan layanan khusus bagi warga yang memiliki dokumen atau arsip keluarga yang rusak akibat bencana alam seperti banjir atau kebakaran. Layanan yang diberi nama LASIGA (Layanan Arsip Keluarga) ini memberikan jasa restorasi dan penyelamatan arsip secara gratis.\n\nPetugas kearsipan yang terlatih akan melakukan penanganan khusus menggunakan teknik pembersihan, pengeringan, hingga laminasi ulang jika diperlukan. Warga hanya perlu membawa dokumen aslinya ke kantor Sudin Pusip Jakarta Selatan untuk dilakukan pengecekan awal.\n\nSelain restorasi, LASIGA juga mendorong warga untuk mendigitalisasi arsip-arsip penting mereka sebagai langkah antisipasi di masa depan. Dengan memiliki salinan digital, bukti kepemilikan atau identitas tetap terjaga meskipun dokumen fisik mengalami kerusakan.",
-    "imageUrl": "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    "id": "3",
-    "title": "Penghargaan Perpustakaan Sekolah Terbaik Jakarta Selatan 2024",
+    "id": "1778531200001",
+    "title": "Sudin Pusip Jaksel Raih Penghargaan Pelayanan Publik Terbaik",
     "category": "Penghargaan",
-    "date": "20 April 2024",
-    "excerpt": "Beberapa sekolah di wilayah Jakarta Selatan berhasil meraih penghargaan atas inovasi mereka dalam mengelola perpustakaan yang menarik bagi siswa.",
-    "content": "Jakarta Selatan – Apresiasi tinggi diberikan kepada sekolah-sekolah di wilayah Jakarta Selatan yang berhasil melakukan inovasi dalam pengelolaan perpustakaan sekolah. Penghargaan ini diberikan sebagai bentuk motivasi agar perpustakaan sekolah menjadi tempat yang nyaman dan menjadi pusat belajar bagi para siswa.\n\nBeberapa kriteria penilaian meliputi kelengkapan koleksi, kemudahan akses digital, kebersihan, hingga kreativitas program literasi sekolah. Pemenang tahun ini menunjukkan bahwa dengan anggaran terbatas, sekolah tetap bisa menciptakan lingkungan baca yang inspiratif.\n\nPenghargaan ini diharapkan dapat memicu semangat kompetitif yang positif di antara sekolah-sekolah lain untuk terus meningkatkan standar layanan literasi mereka.",
-    "imageUrl": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800"
+    "date": "18 Agustus 2026",
+    "excerpt": "Prestasi gemilang diraih oleh Suku Dinas Perpustakaan dan Kearsipan Jakarta Selatan tingkat nasional.",
+    "content": "Suku Dinas Perpustakaan dan Kearsipan (Sudin Pusip) Jakarta Selatan kembali menorehkan prestasi gemilang dengan meraih penghargaan sebagai Institusi Pelayanan Publik Terbaik kategori Peningkatan Literasi Masyarakat. Penghargaan ini diserahkan langsung oleh Gubernur DKI Jakarta atas inovasi layanan perpustakaan keliling dan digitalisasi arsip yang dinilai sangat membantu warga.",
+    "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
   },
   {
-    "id": "4",
-    "title": "Program IKRA: Literasi Digital Untuk Keluarga Modern",
-    "category": "Literasi",
-    "date": "15 April 2024",
-    "excerpt": "Inisiatif Keluarga Ringkas Aksara (IKRA) menghadirkan tantangan membaca bagi keluarga di Jakarta Selatan guna mempererat hubungan orang tua dan anak melalui buku.",
-    "content": "Jakarta Selatan – Di era digital ini, membiasakan anak membaca buku cetak menjadi tantangan tersendiri bagi orang tua. Melalui Program IKRA (Inisiatif Keluarga Ringkas Aksara), Sudin Pusip Jakarta Selatan mengajak keluarga untuk meluangkan waktu setidaknya 15 menit sehari untuk membaca bersama.\n\nProgram ini tidak hanya berfokus pada anak, tetapi juga melatih orang tua untuk menjadi teladan dalam literasi. Keluarga yang berpartisipasi akan diberikan buku pinjaman secara bergilir dan diminta untuk mengisi jurnal bacaan sebagai bentuk monitoring.\n\nIKRA terbukti efektif dalam meningkatkan kedekatan emosional antara anggota keluarga sekaligus meningkatkan kecakapan literasi anak secara signifikan.",
-    "imageUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    "id": "5",
-    "title": "Digitalisasi Arsip Statis: Menjaga Sejarah Jakarta Selatan",
+    "id": "1778531200002",
+    "title": "Pameran Arsip Sejarah: Mengenang Jakarta Tempo Dulu",
     "category": "Kearsipan",
-    "date": "10 April 2024",
-    "excerpt": "Langkah proaktif dalam melakukan digitalisasi ribuan dokumen sejarah agar dapat diakses oleh generasi mendatang tanpa risiko kerusakan fisik.",
-    "content": "Jakarta Selatan – Sejarah wilayah Jakarta Selatan tersimpan dalam ribuan lembar arsip statis yang kini tengah dalam proses digitalisasi massal. Langkah ini diambil untuk menjaga data-data bersejarah dari ancaman kerusakan fisik akibat usia, kelembapan, maupun risiko bencana.\n\nDokumen yang didigitalisasi meliputi peta wilayah lama, keputusan-keputusan penting masa lampau, hingga foto-foto dokumentasi pembangunan Jakarta Selatan dari masa ke masa. Dengan format digital, peneliti dan masyarakat umum nantinya dapat mengakses informasi ini dengan lebih mudah melalui sistem arsip online.\n\nDigitalisasi ini merupakan investasi jangka panjang dalam menjaga identitas kolektif warga Jakarta Selatan.",
+    "date": "15 Agustus 2026",
+    "excerpt": "Sudin Pusip menggelar pameran foto dan dokumen langka yang menceritakan evolusi kota Jakarta.",
+    "content": "Dalam rangka memperingati Hari Kemerdekaan, Sudin Pusip Jakarta Selatan menyelenggarakan pameran bertema 'Mengenang Jakarta Tempo Dulu'. Pameran ini menampilkan ratusan foto historis, surat kabar kuno, hingga dokumen pemerintahan peninggalan kolonial Belanda. Tujuan acara ini adalah untuk mengedukasi generasi muda mengenai pentingnya menjaga memori kolektif bangsa.",
+    "imageUrl": "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200003",
+    "title": "Pelatihan Menulis Kreatif untuk Remaja Jakarta Selatan",
+    "category": "Event",
+    "date": "10 Agustus 2026",
+    "excerpt": "Kegiatan ini bertujuan untuk menggali potensi penulis muda yang berbakat di lingkungan pelajar.",
+    "content": "Sebanyak 50 siswa SMA se-Jakarta Selatan mengikuti pelatihan menulis kreatif yang diadakan oleh Sudin Pusip. Kegiatan yang berlangsung selama tiga hari ini dibimbing oleh penulis novel ternama. Peserta diajarkan teknik dasar menulis fiksi, membangun karakter, hingga merancang alur cerita yang memikat. Karya terbaik dari pelatihan ini akan diterbitkan menjadi sebuah antologi cerpen.",
+    "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200004",
+    "title": "Kolaborasi dengan Komunitas Baca: Menebar Virus Literasi",
+    "category": "Literasi",
+    "date": "05 Agustus 2026",
+    "excerpt": "Sinergi antara pemerintah dan komunitas lokal untuk meningkatkan minat baca di akar rumput.",
+    "content": "Sudin Pusip menjalin kerjasama strategis dengan 10 komunitas literasi independen yang tersebar di berbagai kecamatan Jakarta Selatan. Melalui kolaborasi ini, Sudin memberikan dukungan berupa suplai buku baru dan pembinaan manajemen taman bacaan. Diharapkan gerakan ini dapat mempercepat peningkatan indeks literasi warga, khususnya di area padat penduduk.",
+    "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200005",
+    "title": "Lomba Bercerita Anak Tingkat Kota: Asah Kreativitas Sejak Dini",
+    "category": "Event",
+    "date": "01 Agustus 2026",
+    "excerpt": "Ajang kompetisi yang dinanti-nanti oleh murid sekolah dasar kembali digelar dengan meriah.",
+    "content": "Antusiasme luar biasa terlihat pada Lomba Bercerita Anak tingkat SD/MI se-Jakarta Selatan. Ratusan anak berkompetisi membawakan cerita rakyat daerah dengan penuh ekspresi dan properti pendukung yang kreatif. Lomba ini tidak hanya mengasah keberanian anak tampil di depan umum, tetapi juga menumbuhkan rasa cinta mereka terhadap budaya literasi sejak dini.",
     "imageUrl": "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800"
   },
   {
-    "id": "6",
-    "title": "Wisata Literasi: Mengenal Perpustakaan Umum Jaksel Lebih Dekat",
-    "category": "Event",
-    "date": "05 April 2024",
-    "excerpt": "Kunjungan rutin sekolah-sekolah ke Perpustakaan Umum Jakarta Selatan untuk memperkenalkan fasilitas dan koleksi buku yang tersedia secara gratis.",
-    "content": "Jakarta Selatan – Perpustakaan Umum Jakarta Selatan kini tidak hanya sekadar tempat meminjam buku, tetapi juga menjadi destinasi wisata edukasi yang menarik. Melalui program 'Wisata Literasi', sekolah-sekolah diajak untuk berkunjung dan mengenal lebih dekat fasilitas yang ada.\n\nPara siswa diberikan tur keliling perpustakaan, cara mencari buku menggunakan katalog digital (OPAC), hingga mengikuti sesi nonton bareng film edukasi di ruang audiovisual. Pengalaman langsung ini diharapkan dapat mengubah persepsi anak-anak bahwa perpustakaan adalah tempat yang kaku dan membosankan.\n\nWisata Literasi terbuka untuk seluruh tingkatan sekolah dengan melakukan pendaftaran terlebih dahulu melalui kanal komunikasi resmi Sudin Pusip Jaksel.",
-    "imageUrl": "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800"
+    "id": "1778531200006",
+    "title": "Peluncuran Aplikasi e-Pusda Jaksel Versi 2.0",
+    "category": "Literasi",
+    "date": "28 Juli 2026",
+    "excerpt": "Versi terbaru aplikasi perpustakaan digital hadir dengan antarmuka yang lebih segar dan koleksi melimpah.",
+    "content": "Kabar gembira bagi para pencinta buku. Sudin Pusip resmi meluncurkan aplikasi e-Pusda Jaksel versi 2.0. Pembaruan ini membawa perombakan besar pada sisi antarmuka agar lebih ramah pengguna. Selain itu, terdapat penambahan lebih dari 5.000 judul e-book baru yang mencakup berbagai genre, mulai dari buku pelajaran, novel populer, hingga literatur bisnis.",
+    "imageUrl": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200007",
+    "title": "Kegiatan Bedah Buku Bersama Penulis Lokal Inspiratif",
+    "category": "Literasi",
+    "date": "25 Juli 2026",
+    "excerpt": "Diskusi hangat membahas proses kreatif di balik lahirnya karya sastra yang sukses di pasaran.",
+    "content": "Ruang aula Sudin Pusip dipenuhi oleh para pembaca setia yang hadir dalam acara bedah buku novel terlaris bulan ini. Penulis berbagi pengalaman suka duka selama proses riset dan penulisan. Peserta juga diberikan kesempatan untuk bertanya langsung dan mendapatkan buku bertanda tangan. Acara rutin ini bertujuan mendekatkan masyarakat dengan para pegiat sastra tanah air.",
+    "imageUrl": "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200008",
+    "title": "Restorasi Arsip Kuno Masa Kolonial Berjalan Lancar",
+    "category": "Kearsipan",
+    "date": "20 Juli 2026",
+    "excerpt": "Proyek perbaikan dokumen rapuh yang memiliki nilai sejarah tinggi menggunakan teknik khusus.",
+    "content": "Tim preservasi dari bidang kearsipan Sudin Pusip terus bekerja ekstra hati-hati dalam merestorasi tumpukan arsip peninggalan pemerintahan Hindia Belanda yang kondisinya sangat rapuh. Menggunakan kertas tisu Jepang dan cairan kimia khusus, teks-teks kuno yang memuat data tata kota masa lalu berhasil diselamatkan dari kepunahan dan telah didigitalisasi.",
+    "imageUrl": "https://images.unsplash.com/photo-1581447109200-bf2769116351?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200009",
+    "title": "Sosialisasi Pentingnya Kearsipan di Lingkungan Sekolah",
+    "category": "Kearsipan",
+    "date": "15 Juli 2026",
+    "excerpt": "Memberikan pemahaman kepada pihak sekolah tentang tata kelola dokumen yang baik dan benar.",
+    "content": "Banyak sekolah yang masih mengabaikan manajemen pengarsipan dokumen penting seperti ijazah dan laporan bos. Untuk mengatasi hal ini, Sudin Pusip rutin melakukan safari sosialisasi ke berbagai SMP dan SMA. Para tata usaha diajarkan klasifikasi arsip, metode penyusutan, dan cara menyimpan arsip fisik agar aman dari kerusakan akibat kelembaban maupun serangga.",
+    "imageUrl": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200010",
+    "title": "Bantuan Ribuan Buku untuk Taman Baca Masyarakat",
+    "category": "Literasi",
+    "date": "10 Juli 2026",
+    "excerpt": "Distribusi buku fisik sebagai upaya pemerataan bahan bacaan di daerah pinggiran.",
+    "content": "Sebagai bentuk kepedulian terhadap fasilitas pendidikan non-formal, Sudin Pusip mendistribusikan lebih dari 3.000 buku ke belasan Taman Bacaan Masyarakat (TBM) yang ada di Jakarta Selatan. Buku-buku ini merupakan hasil donasi warga dan pengadaan anggaran dinas. Diharapkan sumbangan ini dapat menarik lebih banyak anak-anak untuk rutin mengunjungi TBM di sekitar rumah mereka.",
+    "imageUrl": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    "id": "1778531200011",
+    "title": "Pemilihan Duta Baca Jakarta Selatan 2026",
+    "category": "Penghargaan",
+    "date": "05 Juli 2026",
+    "excerpt": "Mencari sosok ikonik yang mampu mengkampanyekan pentingnya membaca kepada kaum milenial.",
+    "content": "Puncak acara pemilihan Duta Baca Jakarta Selatan 2026 berlangsung gemerlap. Dari ratusan peserta, terpilih sepasang pemuda-pemudi inspiratif yang akan bertugas selama setahun penuh menjadi wajah kampanye literasi di wilayah Jakarta Selatan. Keduanya dinilai memiliki visi misi yang inovatif dalam memanfaatkan media sosial untuk mengajak generasi Z lebih mencintai buku.",
+    "imageUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&q=80&w=800"
   }
 ]

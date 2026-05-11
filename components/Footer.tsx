@@ -1,6 +1,15 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const Footer = () => {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/login')) {
+    return null;
+  }
+
   return (
     <footer className="bg-primary text-white pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-6">
@@ -8,9 +17,8 @@ const Footer = () => {
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-6 justify-center md:justify-start">
               <div className="w-10 h-10 bg-white flex items-center justify-center rounded-lg">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-primary">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-primary">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 </svg>
               </div>
               <div className="text-left">
@@ -26,10 +34,11 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-bold mb-6 text-secondary">Tautan Cepat</h3>
             <ul className="space-y-4 text-sm text-slate-300">
-              <li><Link href="#" className="hover:text-white transition-colors">Tentang Kami</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Layanan Perpustakaan</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Layanan Kearsipan</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Agenda Kegiatan</Link></li>
+              <li><Link href="/profil" className="hover:text-white transition-colors">Tentang Kami</Link></li>
+              <li><Link href="/layanan" className="hover:text-white transition-colors">Layanan Perpustakaan</Link></li>
+              <li><Link href="/artikel" className="hover:text-white transition-colors">Layanan Kearsipan</Link></li>
+              <li><Link href="/event" className="hover:text-white transition-colors">Agenda Kegiatan</Link></li>
+              <li><Link href="/pusling" className="hover:text-white transition-colors">Jadwal Pusling</Link></li>
             </ul>
           </div>
 

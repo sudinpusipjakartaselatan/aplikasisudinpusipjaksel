@@ -1,0 +1,134 @@
+[
+  {
+    "id": "1778531200000",
+    "title": "Festival Literasi Jakarta Selatan 2026",
+    "date": "20 September 2026",
+    "time": "08:00 - 17:00 WIB",
+    "location": "Halaman Utama Kantor Walikota",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/literasi2026",
+    "description": "Perayaan puncak literasi terbesar di Jakarta Selatan. Akan ada bursa buku murah, pertunjukan seni, pameran inovasi perpustakaan, hingga diskusi panel bersama penulis best-seller nasional."
+  },
+  {
+    "id": "1778531200001",
+    "title": "Pelatihan Manajemen Arsip Digital Berbasis Cloud",
+    "date": "25 September 2026",
+    "time": "09:00 - 15:00 WIB",
+    "location": "Ruang Aula Sudin Pusip / Zoom",
+    "price": "Rp 50.000",
+    "imageUrl": "https://images.unsplash.com/photo-1543269664-56d93c1b41a6?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/arsipdigital",
+    "description": "Pelatihan intensif khusus aparatur sipil negara dan staf tata usaha swasta. Mengajarkan transisi dari arsip kertas ke arsip digital cloud yang aman dan mudah diakses dari mana saja."
+  },
+  {
+    "id": "1778531200002",
+    "title": "Workshop Pembuatan Konten Edukasi Interaktif",
+    "date": "02 Oktober 2026",
+    "time": "13:00 - 16:00 WIB",
+    "location": "Laboratorium Komputer Pusda",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/kontenedukasi",
+    "description": "Pelatihan bagi para pustakawan dan pengajar untuk membuat bahan bacaan berbentuk multimedia interaktif agar anak-anak tidak mudah bosan saat belajar."
+  },
+  {
+    "id": "1778531200003",
+    "title": "Lomba Bercerita Anak Tingkat SD Se-Jakarta Selatan",
+    "date": "10 Oktober 2026",
+    "time": "08:00 - 14:00 WIB",
+    "location": "Panggung Utama RPTRA Kebagusan",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/lombacerita",
+    "description": "Ajang kompetisi membawakan dongeng nusantara untuk anak Sekolah Dasar. Terdapat hadiah trofi walikota dan uang pembinaan puluhan juta rupiah."
+  },
+  {
+    "id": "1778531200004",
+    "title": "Bedah Buku: Menelusuri Sejarah Kota Tua Jakarta",
+    "date": "15 Oktober 2026",
+    "time": "10:00 - 12:00 WIB",
+    "location": "Perpustakaan Daerah Jaksel",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "",
+    "description": "Diskusi santai dan bedah karya bersama sejarawan terkemuka. Membedah tuntas buku sejarah dan arsip-arsip pembangunan Batavia di masa lampau."
+  },
+  {
+    "id": "1778531200005",
+    "title": "Seminar Menulis Cerpen untuk Pemula",
+    "date": "20 Oktober 2026",
+    "time": "14:00 - 17:00 WIB",
+    "location": "Zoom Meeting Room",
+    "price": "Rp 25.000",
+    "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/seminarcerpen",
+    "description": "Ingin karya cerpenmu dimuat di media cetak nasional? Temukan tips dan trik merangkai kata dan membangun premis cerita yang memikat para editor."
+  },
+  {
+    "id": "1778531200006",
+    "title": "Pameran Fotografi: Jakarta Tempo Dulu",
+    "date": "25 Oktober 2026",
+    "time": "09:00 - 20:00 WIB",
+    "location": "Lobby Utama Kantor Sudin Pusip",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "",
+    "description": "Pameran visual gratis yang dibuka untuk umum. Ratusan koleksi arsip visual mengenai perkembangan sudut-sudut kota Jakarta dari tahun ke tahun."
+  },
+  {
+    "id": "1778531200007",
+    "title": "Temu Komunitas Baca Se-Jakarta",
+    "date": "01 November 2026",
+    "time": "10:00 - 15:00 WIB",
+    "location": "Taman Literasi Martha Tiahahu",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/temukomunitas",
+    "description": "Ajang kumpul dan bertukar ide bagi para penggerak komunitas literasi dari berbagai penjuru ibu kota. Termasuk acara tukar buku gratis."
+  },
+  {
+    "id": "1778531200008",
+    "title": "Bimbingan Teknis Pengelolaan Perpustakaan Desa/Kelurahan",
+    "date": "05 November 2026",
+    "time": "08:00 - 16:00 WIB",
+    "location": "Aula Serbaguna Gedung C",
+    "price": "Rp 100.000",
+    "imageUrl": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/bimtekpus",
+    "description": "Pelatihan tata laksana perpustakaan, klasifikasi buku DDC, hingga layanan peminjaman buku sirkulasi untuk pustakawan kelurahan."
+  },
+  {
+    "id": "1778531200009",
+    "title": "Kelas Mendongeng Bersama Pakar",
+    "date": "10 November 2026",
+    "time": "15:00 - 17:00 WIB",
+    "location": "Ruang Bermain Anak Perpustakaan",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/dongeng",
+    "description": "Membekali para orang tua dan guru TK/PAUD dengan teknik intonasi dan ekspresi dalam membacakan cerita kepada anak-anak agar lebih interaktif."
+  },
+  {
+    "id": "1778531200010",
+    "title": "Pelatihan Preservasi Arsip Kertas & Dokumen Penting",
+    "date": "15 November 2026",
+    "time": "09:00 - 13:00 WIB",
+    "location": "Laboratorium Kearsipan",
+    "price": "Rp 75.000",
+    "imageUrl": "https://images.unsplash.com/photo-1581447109200-bf2769116351?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/preservasi",
+    "description": "Kegiatan praktik langsung cara menyelamatkan dokumen kuno, ijazah, atau sertifikat rumah yang rusak karena air atau rayap menggunakan bahan preservasi khusus."
+  },
+  {
+    "id": "1778531200011",
+    "title": "Diskusi Panel: Masa Depan Perpustakaan di Era Artificial Intelligence",
+    "date": "20 November 2026",
+    "time": "13:00 - 16:00 WIB",
+    "location": "Live YouTube & Zoom",
+    "price": "Gratis",
+    "imageUrl": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800",
+    "registrationUrl": "https://forms.gle/panelai",
+    "description": "Mengupas tuntas ancaman dan peluang yang dihadirkan oleh teknologi AI terhadap eksistensi perpustakaan fisik dan cara beradaptasi dengannya."
+  }
+]
