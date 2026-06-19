@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Article, Event, MobileLibrary } from '@/lib/db';
+import { Article, Kegiatan, MobileLibrary } from '@/lib/db';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import ImageCropModal from '@/components/ImageCropModal';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'articles' | 'events' | 'mobile_libraries'>('articles');
+  const [activeTab, setActiveTab] = useState<'articles' | 'kegiatan' | 'mobile_libraries'>('articles');
   const [articles, setArticles] = useState<Article[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
+  const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
   const [mobileLibraries, setMobileLibraries] = useState<MobileLibrary[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -25,15 +26,17 @@ export default function AdminDashboard() {
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   
-  // Event Form State
-  const [eventTitle, setEventTitle] = useState('');
-  const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventPrice, setEventPrice] = useState('');
-  const [eventImageUrl, setEventImageUrl] = useState('');
-  const [eventRegistrationUrl, setEventRegistrationUrl] = useState('');
-  const [eventDescription, setEventDescription] = useState('');
+  // Kegiatan Form State
+  const [kegiatanTitle, setKegiatanTitle] = useState('');
+  const [kegiatanDate, setKegiatanDate] = useState('');
+  const [kegiatanTime, setKegiatanTime] = useState('');
+  const [kegiatanLocation, setKegiatanLocation] = useState('');
+  const [kegiatanImageUrls, setKegiatanImageUrls] = useState('');
+  const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url');
+  const [kegiatanFiles, setKegiatanFiles] = useState<File[]>([]);
+  const [cropImageSrc, setCropImageSrc] = useState('');
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [kegiatanDescription, setKegiatanDescription] = useState('');
 
   // Mobile Library Form State
   const [mlTitle, setMlTitle] = useState('');
@@ -51,15 +54,15 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [resArticles, resEvents, resMobileLibs] = await Promise.all([
+      const [resArticles, resKegiatan, resMobileLibs] = await Promise.all([
         fetch('/api/articles'),
-        fetch('/api/events'),
+        fetch('/api/kegiatan'),
         fetch('/api/mobile-libraries')
       ]);
 
-      if (resArticles.ok && resEvents.ok && resMobileLibs.ok) {
+      if (resArticles.ok && resKegiatan.ok && resMobileLibs.ok) {
         setArticles(await resArticles.json());
-        setEvents(await resEvents.json());
+        setKegiatan(await resKegiatan.json());
         setMobileLibraries(await resMobileLibs.json());
       } else {
         router.push('/login');
@@ -92,13 +95,41 @@ export default function AdminDashboard() {
     } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
   };
 
-  const handleSubmitEvent = async (e: React.FormEvent) => {
+  const handleSubmitKegiatan = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const eventData = { title: eventTitle, date: eventDate, time: eventTime, location: eventLocation, price: eventPrice, imageUrl: eventImageUrl, registrationUrl: eventRegistrationUrl, description: eventDescription };
+    let parsedUrls = kegiatanImageUrls.split(/[\n,]+/).map(u => u.trim()).filter(u => u);
+    
+    if (uploadMethod === 'file' && kegiatanFiles.length > 0) {
+       const formData = new FormData();
+       kegiatanFiles.forEach(file => formData.append('files', file));
+       const tempId = editingId || Date.now().toString();
+       formData.append('idKegiatan', tempId);
+       
+       try {
+         const resUpload = await fetch('/api/upload', { method: 'POST', body: formData });
+         if (resUpload.ok) {
+            const data = await resUpload.json();
+            parsedUrls = [...parsedUrls, ...data.urls];
+         } else {
+            const data = await resUpload.json();
+            alert('Gagal upload gambar: ' + (data.error || resUpload.statusText));
+            setIsSubmitting(false);
+            return;
+         }
+       } catch (err) {
+         console.error(err);
+         alert('Gagal upload gambar');
+         setIsSubmitting(false);
+         return;
+       }
+    }
+
+    const mainImageUrl = parsedUrls.length > 0 ? parsedUrls[0] : '';
+    const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription };
     try {
-      const res = await fetch(editingId ? `/api/events/${editingId}` : '/api/events', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(eventData) });
-      if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan event');
+      const res = await fetch(editingId ? `/api/kegiatan/${editingId}` : '/api/kegiatan', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kegiatanData) });
+      if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan kegiatan');
     } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
   };
 
@@ -116,8 +147,8 @@ export default function AdminDashboard() {
     setEditingId(article.id); setTitle(article.title); setCategory(article.category); setExcerpt(article.excerpt); setContent(article.content); setImageUrl(article.imageUrl); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleEditEvent = (event: Event) => {
-    setEditingId(event.id); setEventTitle(event.title); setEventDate(event.date); setEventTime(event.time); setEventLocation(event.location); setEventPrice(event.price); setEventImageUrl(event.imageUrl); setEventRegistrationUrl(event.registrationUrl); setEventDescription(event.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleEditKegiatan = (kegiatan: Kegiatan) => {
+    setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEditMobileLib = (ml: MobileLibrary) => {
@@ -130,9 +161,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteEvent = async (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus event ini?')) {
-      try { const res = await fetch(`/api/events/${id}`, { method: 'DELETE' }); if (res.ok) fetchData(); else alert('Gagal menghapus event'); } catch (err) { console.error(err); }
+  const handleDeleteKegiatan = async (id: string) => {
+    if (confirm('Apakah Anda yakin ingin menghapus kegiatan ini?')) {
+      try { const res = await fetch(`/api/kegiatan/${id}`, { method: 'DELETE' }); if (res.ok) fetchData(); else alert('Gagal menghapus kegiatan'); } catch (err) { console.error(err); }
     }
   };
 
@@ -146,8 +177,8 @@ export default function AdminDashboard() {
     setEditingId(null);
     if (activeTab === 'articles') {
       setTitle(''); setCategory('Literasi'); setExcerpt(''); setContent(''); setImageUrl('');
-    } else if (activeTab === 'events') {
-      setEventTitle(''); setEventDate(''); setEventTime(''); setEventLocation(''); setEventPrice(''); setEventImageUrl(''); setEventRegistrationUrl(''); setEventDescription('');
+    } else if (activeTab === 'kegiatan') {
+      setKegiatanTitle(''); setKegiatanDate(''); setKegiatanTime(''); setKegiatanLocation(''); setKegiatanImageUrls(''); setKegiatanFiles([]); setUploadMethod('url'); setKegiatanDescription(''); setCropImageSrc(''); setIsCropModalOpen(false);
     } else {
       setMlTitle(''); setMlDate(''); setMlTime(''); setMlLocation(''); setMlImageUrl(''); setMlDescription('');
     }
@@ -173,15 +204,9 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className={`fixed md:sticky top-20 md:top-0 h-[calc(100vh-5rem)] md:h-screen left-0 z-20 md:z-30 shrink-0 bg-primary text-white flex flex-col border-r border-white/5 transform transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 p-8 ${isDesktopSidebarOpen ? '' : 'md:w-24 md:p-4 md:items-center'}`}>
         <div className={`mb-12 flex items-start w-full justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'}`}>
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white flex items-center justify-center rounded-lg shadow-lg shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-primary">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              </svg>
-            </div>
-            <div className={`transition-all duration-300 overflow-hidden opacity-100 w-32 ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0'}`}>
-              <h1 className="text-lg font-bold leading-none whitespace-nowrap">Sudin Pusip</h1>
-              <p className="text-[10px] text-secondary uppercase tracking-widest font-bold whitespace-nowrap">Admin Panel</p>
+          <Link href="/" className="flex items-center justify-center">
+            <div className={`h-8 shrink-0 ${isDesktopSidebarOpen ? 'md:h-10' : 'md:h-8'}`}>
+              <img src="/api/images/logo/logo-sudin-pusip.jpeg" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
             </div>
           </Link>
         </div>
@@ -191,9 +216,9 @@ export default function AdminDashboard() {
             <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 ml-3 w-auto ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0 md:ml-0'}`}>Kelola Artikel</span>
           </button>
 
-          <button onClick={() => { setActiveTab('events'); setShowAddForm(false); resetForm(); }} className={`w-full p-3 rounded-xl font-bold flex items-center cursor-pointer border shadow-inner transition-all justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'} ${activeTab === 'events' ? 'bg-white/10 text-secondary border-white/5' : 'hover:bg-white/5 text-slate-300 hover:text-white border-transparent'}`}>
+          <button onClick={() => { setActiveTab('kegiatan'); setShowAddForm(false); resetForm(); }} className={`w-full p-3 rounded-xl font-bold flex items-center cursor-pointer border shadow-inner transition-all justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'} ${activeTab === 'kegiatan' ? 'bg-white/10 text-secondary border-white/5' : 'hover:bg-white/5 text-slate-300 hover:text-white border-transparent'}`}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-            <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 ml-3 w-auto ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0 md:ml-0'}`}>Kelola Event</span>
+            <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 ml-3 w-auto ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0 md:ml-0'}`}>Kelola Kegiatan</span>
           </button>
 
           <button onClick={() => { setActiveTab('mobile_libraries'); setShowAddForm(false); resetForm(); }} className={`w-full p-3 rounded-xl font-bold flex items-center cursor-pointer border shadow-inner transition-all justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'} ${activeTab === 'mobile_libraries' ? 'bg-white/10 text-secondary border-white/5' : 'hover:bg-white/5 text-slate-300 hover:text-white border-transparent'}`}>
@@ -229,7 +254,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1 md:mb-2">
-                {activeTab === 'articles' ? 'Daftar Artikel' : activeTab === 'events' ? 'Daftar Event' : 'Daftar Pusling'}
+                {activeTab === 'articles' ? 'Daftar Artikel' : activeTab === 'kegiatan' ? 'Daftar Kegiatan' : 'Daftar Pusling'}
               </h1>
               <p className="text-sm md:text-base text-slate-500">Kelola konten yang muncul di halaman utama website</p>
             </div>
@@ -237,7 +262,7 @@ export default function AdminDashboard() {
               {showAddForm ? (
                 <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Batal</>
               ) : (
-                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'articles' ? 'Tambah Artikel Baru' : activeTab === 'events' ? 'Tambah Event Baru' : 'Tambah Jadwal Pusling'}</>
+                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'articles' ? 'Tambah Artikel Baru' : activeTab === 'kegiatan' ? 'Tambah Kegiatan Baru' : 'Tambah Jadwal Pusling'}</>
               )}
             </button>
           </div>
@@ -261,25 +286,86 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {showAddForm && activeTab === 'events' && (
+          {showAddForm && activeTab === 'kegiatan' && (
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 mb-8 md:mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="flex items-center gap-3 mb-6 md:mb-8 pb-4 border-b border-slate-50">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></div>
-                <h3 className="text-lg md:text-xl font-bold text-primary">{editingId ? 'Edit Event' : 'Form Input Event Baru'}</h3>
+                <h3 className="text-lg md:text-xl font-bold text-primary">{editingId ? 'Edit Kegiatan' : 'Form Input Kegiatan Baru'}</h3>
               </div>
-              <form onSubmit={handleSubmitEvent} className="space-y-6 md:space-y-8">
+              <form onSubmit={handleSubmitKegiatan} className="space-y-6 md:space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Judul Event</label><input type="text" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Seminar Literasi..." required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tanggal</label><input type="text" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: 25 Agustus 2026" required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Waktu</label><input type="text" value={eventTime} onChange={(e) => setEventTime(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: 09:00 - 12:00 WIB" required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Lokasi</label><input type="text" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Aula Sudin Pusip / Zoom" required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Biaya / Harga</label><input type="text" value={eventPrice} onChange={(e) => setEventPrice(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Gratis atau Rp 50.000" required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Link Pendaftaran (Opsional)</label><input type="text" value={eventRegistrationUrl} onChange={(e) => setEventRegistrationUrl(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: https://forms.gle/..." /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Judul Kegiatan</label><input type="text" value={kegiatanTitle} onChange={(e) => setKegiatanTitle(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Seminar Literasi..." required /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tanggal</label><input type="text" value={kegiatanDate} onChange={(e) => setKegiatanDate(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: 25 Agustus 2026" required /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Waktu</label><input type="text" value={kegiatanTime} onChange={(e) => setKegiatanTime(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: 09:00 - 12:00 WIB" required /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Lokasi</label><input type="text" value={kegiatanLocation} onChange={(e) => setKegiatanLocation(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Aula Sudin Pusip / Zoom" required /></div>
                 </div>
-                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Deskripsi Event</label><textarea value={eventDescription} onChange={(e) => setEventDescription(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all h-32 text-slate-600 font-medium resize-none" placeholder="Deskripsikan event ini..." required /></div>
-                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tautan Gambar / Poster (Opsional)</label><div className="flex flex-col sm:flex-row gap-4"><input type="text" value={eventImageUrl} onChange={(e) => setEventImageUrl(e.target.value)} className="flex-1 px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="https://..." /><div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center shrink-0 overflow-hidden bg-slate-50">{eventImageUrl ? <img src={eventImageUrl} alt="Preview" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-300"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>}</div></div></div>
-                <div className="flex gap-4 pt-4"><button type="submit" disabled={isSubmitting} className={`flex-1 py-4 md:py-5 rounded-2xl font-extrabold text-white transition-all shadow-lg text-sm md:text-base flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-light hover:-translate-y-1 active:translate-y-0 shadow-primary/20'}`}>{isSubmitting ? <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses Data...</> : (editingId ? 'Simpan Perubahan' : 'Publikasikan Event')}</button></div>
+                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Deskripsi Kegiatan</label><textarea value={kegiatanDescription} onChange={(e) => setKegiatanDescription(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all h-32 text-slate-600 font-medium resize-none" placeholder="Deskripsikan kegiatan ini..." required /></div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2.5">Metode Upload Gambar / Poster</label>
+                  <div className="flex gap-4 mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-600">
+                      <input type="radio" name="uploadMethod" checked={uploadMethod === 'url'} onChange={() => setUploadMethod('url')} className="w-4 h-4 text-primary" /> Input URL
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-600">
+                      <input type="radio" name="uploadMethod" checked={uploadMethod === 'file'} onChange={() => setUploadMethod('file')} className="w-4 h-4 text-primary" /> Upload File Lokal
+                    </label>
+                  </div>
+                  {uploadMethod === 'url' ? (
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tautan Gambar / Poster (Pisahkan dengan koma atau baris baru)</label><div className="flex flex-col sm:flex-row gap-4"><textarea value={kegiatanImageUrls} onChange={(e) => setKegiatanImageUrls(e.target.value)} className="flex-1 px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all h-24 text-slate-600 font-medium resize-none" placeholder="https://image1.jpg&#10;https://image2.jpg" /><div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center shrink-0 overflow-hidden bg-slate-50">{kegiatanImageUrls ? <img src={kegiatanImageUrls.split(/[\n,]+/)[0].trim()} alt="Preview" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-300"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>}</div></div></div>
+                  ) : (
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2.5">Pilih File Gambar (Satu per satu)</label>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            const file = e.target.files[0];
+                            setCropImageSrc(URL.createObjectURL(file));
+                            setIsCropModalOpen(true);
+                            e.target.value = ''; // reset input
+                          }
+                        }} 
+                        className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium bg-slate-50" 
+                      />
+                      {kegiatanFiles.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                          <p className="text-sm font-bold text-slate-700">Gambar yang akan diupload ({kegiatanFiles.length}):</p>
+                          <div className="flex flex-wrap gap-3">
+                            {kegiatanFiles.map((f, idx) => (
+                              <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 shadow-sm group">
+                                <img src={URL.createObjectURL(f)} alt="crop-preview" className="w-full h-full object-cover" />
+                                <button 
+                                  type="button"
+                                  onClick={() => setKegiatanFiles(prev => prev.filter((_, i) => i !== idx))}
+                                  className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  Hapus
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-4 pt-4"><button type="submit" disabled={isSubmitting} className={`flex-1 py-4 md:py-5 rounded-2xl font-extrabold text-white transition-all shadow-lg text-sm md:text-base flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-light hover:-translate-y-1 active:translate-y-0 shadow-primary/20'}`}>{isSubmitting ? <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses Data...</> : (editingId ? 'Simpan Perubahan' : 'Publikasikan Kegiatan')}</button></div>
               </form>
+              {isCropModalOpen && cropImageSrc && (
+                <ImageCropModal 
+                  imageSrc={cropImageSrc}
+                  onCropCompleteAction={(croppedFile) => {
+                    setKegiatanFiles(prev => [...prev, croppedFile]);
+                    setIsCropModalOpen(false);
+                    setCropImageSrc('');
+                  }}
+                  onClose={() => {
+                    setIsCropModalOpen(false);
+                    setCropImageSrc('');
+                  }}
+                />
+              )}
             </div>
           )}
 
@@ -306,10 +392,10 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
             <div className="px-6 md:px-8 py-5 md:py-6 bg-slate-50/50 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <h3 className="font-bold text-primary">
-                Data {activeTab === 'articles' ? 'Artikel' : activeTab === 'events' ? 'Event' : 'Jadwal Pusling'} Terdaftar
+                Data {activeTab === 'articles' ? 'Artikel' : activeTab === 'kegiatan' ? 'Kegiatan' : 'Jadwal Pusling'} Terdaftar
               </h3>
               <span className="text-xs font-bold text-slate-400 bg-white px-3 py-1 rounded-full border border-slate-100">
-                Total: {activeTab === 'articles' ? articles.length : activeTab === 'events' ? events.length : mobileLibraries.length} Data
+                Total: {activeTab === 'articles' ? articles.length : activeTab === 'kegiatan' ? kegiatan.length : mobileLibraries.length} Data
               </span>
             </div>
             
@@ -339,12 +425,12 @@ export default function AdminDashboard() {
                     </tr>
                   ))}
 
-                  {activeTab === 'events' && events.map((event) => (
-                    <tr key={event.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner flex items-center justify-center">{event.imageUrl ? <img src={event.imageUrl} alt="" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{event.title}</div></div></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{event.location}</span><span className={`w-max px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${event.price.toLowerCase() === 'gratis' ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary'}`}>{event.price}</span></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium"><div className="flex flex-col gap-0.5"><span className="text-slate-700 font-bold">{event.date}</span><span>{event.time}</span></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditEvent(event)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteEvent(event.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
+                  {activeTab === 'kegiatan' && kegiatan.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner flex items-center justify-center">{item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{item.title}</div></div></div></td>
+                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{item.location}</span></div></td>
+                      <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium"><div className="flex flex-col gap-0.5"><span className="text-slate-700 font-bold">{item.date}</span><span>{item.time}</span></div></td>
+                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditKegiatan(item)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteKegiatan(item.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
                     </tr>
                   ))}
 
@@ -360,7 +446,7 @@ export default function AdminDashboard() {
               </table>
             </div>
             
-            {((activeTab === 'articles' && articles.length === 0) || (activeTab === 'events' && events.length === 0) || (activeTab === 'mobile_libraries' && mobileLibraries.length === 0)) && (
+            {((activeTab === 'articles' && articles.length === 0) || (activeTab === 'kegiatan' && kegiatan.length === 0) || (activeTab === 'mobile_libraries' && mobileLibraries.length === 0)) && (
               <div className="py-16 md:py-20 text-center flex flex-col items-center gap-4 bg-slate-50/20">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 md:w-8 md:h-8">
@@ -368,7 +454,7 @@ export default function AdminDashboard() {
                   </svg>
                 </div>
                 <p className="text-sm md:text-base text-slate-400 font-medium">
-                  Belum ada {activeTab === 'articles' ? 'artikel' : activeTab === 'events' ? 'event' : 'jadwal pusling'} yang terdaftar
+                  Belum ada {activeTab === 'articles' ? 'artikel' : activeTab === 'kegiatan' ? 'kegiatan' : 'jadwal pusling'} yang terdaftar
                 </p>
               </div>
             )}

@@ -1,13 +1,14 @@
 import Hero from '@/components/Hero';
 import ArticleCard from '@/components/ArticleCard';
 import EventCard from '@/components/EventCard';
+import KegiatanCard from '@/components/KegiatanCard';
 import MobileLibraryCard from '@/components/MobileLibraryCard';
-import { getArticles, getEvents, getMobileLibraries } from '@/lib/db';
+import { getArticles, getKegiatan, getMobileLibraries } from '@/lib/db';
 import Link from 'next/link';
 
 export default async function Home() {
   const articles = getArticles().slice(0, 4); // Show only top 4
-  const events = getEvents().slice(0, 4); // Show only top 4 events
+  const kegiatan = getKegiatan().slice(0, 4); // Show only top 4 kegiatan
   const mobileLibraries = getMobileLibraries().slice(0, 4); // Show only top 4
 
 
@@ -68,7 +69,7 @@ export default async function Home() {
                 Jangan lewatkan berbagai kegiatan menarik yang kami selenggarakan. Segera daftarkan diri Anda sebelum kuota penuh!
               </p>
             </div>
-            <Link href="/event" className="text-sm font-bold text-heading-text hover:text-blue-500 transition-colors flex items-center gap-2 pb-1 border-b-2 border-primary-light/20 hover:border-blue-500 shrink-0">
+            <Link href="/kegiatan" className="text-sm font-bold text-heading-text hover:text-blue-500 transition-colors flex items-center gap-2 pb-1 border-b-2 border-primary-light/20 hover:border-blue-500 shrink-0">
               Lihat Semua Agenda
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -77,18 +78,16 @@ export default async function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {events.length > 0 ? (
-              events.map((event) => (
-                <EventCard 
-                  key={event.id}
-                  id={event.id}
-                  title={event.title}
-                  date={event.date}
-                  time={event.time}
-                  location={event.location}
-                  price={event.price}
-                  imageUrl={event.imageUrl}
-                  registrationUrl={event.registrationUrl}
+            {kegiatan.length > 0 ? (
+              kegiatan.map((item) => (
+                <KegiatanCard 
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  date={item.date}
+                  time={item.time}
+                  location={item.location}
+                  imageUrl={item.imageUrl}
                 />
               ))
             ) : (

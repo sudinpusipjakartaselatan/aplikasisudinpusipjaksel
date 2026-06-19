@@ -35,15 +35,9 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-lg shadow-lg">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-base md:text-lg font-bold leading-none text-heading-text">Sudin Pusip</h1>
-            <p className="text-[9px] md:text-[10px] font-semibold text-secondary uppercase tracking-widest">Jakarta Selatan</p>
+        <Link href="/" className="flex items-center">
+          <div className="h-8 md:h-10 shrink-0">
+            <img src="/api/images/logo/logo-sudin-pusip.jpeg" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
           </div>
         </Link>
 
@@ -53,7 +47,7 @@ const Header = () => {
           <Link href="/profil" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/profil' ? 'text-heading-text' : 'text-foreground'}`}>Profil</Link>
           <Link href="/layanan" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/layanan' ? 'text-heading-text' : 'text-foreground'}`}>Layanan</Link>
           <Link href="/artikel" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/artikel' ? 'text-heading-text' : 'text-foreground'}`}>Artikel</Link>
-          <Link href="/event" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/event' ? 'text-heading-text' : 'text-foreground'}`}>Agenda</Link>
+          <Link href="/kegiatan" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/kegiatan' ? 'text-heading-text' : 'text-foreground'}`}>Kegiatan</Link>
           <Link href="/pusling" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/pusling' ? 'text-heading-text' : 'text-foreground'}`}>Pusling</Link>
           <Link href="/kontak" className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-secondary ${pathname === '/kontak' ? 'text-heading-text' : 'text-foreground'}`}>Kontak</Link>
         </nav>
@@ -112,7 +106,7 @@ const Header = () => {
           <Link href="/profil" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/profil' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Profil</Link>
           <Link href="/layanan" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/layanan' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Layanan</Link>
           <Link href="/artikel" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/artikel' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Artikel</Link>
-          <Link href="/event" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/event' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Agenda</Link>
+          <Link href="/kegiatan" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/kegiatan' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Kegiatan</Link>
           <Link href="/pusling" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/pusling' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Pusling</Link>
           <Link href="/kontak" className={`text-base font-semibold transition-colors w-full text-center py-2 ${pathname === '/kontak' ? 'text-heading-text' : 'text-foreground hover:text-primary dark:hover:text-secondary'}`} onClick={() => setIsMenuOpen(false)}>Kontak</Link>
           <a 

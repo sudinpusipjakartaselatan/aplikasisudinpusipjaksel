@@ -76,81 +76,80 @@ export const deleteArticle = (id: string) => {
 };
 
 // ==========================================
-// EVENTS DATABASE
+// KEGIATAN DATABASE
 // ==========================================
 
-const EVENT_DB_PATH = path.join(process.cwd(), 'database', 'events.json');
+const KEGIATAN_DB_PATH = path.join(process.cwd(), 'database', 'kegiatan.json');
 
-export interface Event {
+export interface Kegiatan {
   id: string;
   title: string;
   date: string;
   time: string;
   location: string;
-  price: string;
-  imageUrl: string;
-  registrationUrl: string;
+  imageUrl?: string;
+  imageUrls?: string[];
   description: string;
 }
 
-export const getEvents = (): Event[] => {
+export const getKegiatan = (): Kegiatan[] => {
   try {
-    if (!fs.existsSync(EVENT_DB_PATH)) return [];
-    const data = fs.readFileSync(EVENT_DB_PATH, 'utf8');
+    if (!fs.existsSync(KEGIATAN_DB_PATH)) return [];
+    const data = fs.readFileSync(KEGIATAN_DB_PATH, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    console.error('Error reading Events DB:', error);
+    console.error('Error reading Kegiatan DB:', error);
     return [];
   }
 };
 
-export const saveEvents = (events: Event[]) => {
+export const saveKegiatan = (kegiatan: Kegiatan[]) => {
   try {
     if (process.env.VERCEL) {
-      console.warn('Cannot save events on Vercel (Read-only File System)');
+      console.warn('Cannot save kegiatan on Vercel (Read-only File System)');
       return false;
     }
-    fs.writeFileSync(EVENT_DB_PATH, JSON.stringify(events, null, 2), 'utf8');
+    fs.writeFileSync(KEGIATAN_DB_PATH, JSON.stringify(kegiatan, null, 2), 'utf8');
     return true;
   } catch (error) {
-    console.error('Error writing Events DB:', error);
+    console.error('Error writing Kegiatan DB:', error);
     return false;
   }
 };
 
-export const getEventById = (id: string): Event | undefined => {
-  const events = getEvents();
-  return events.find(e => e.id === id);
+export const getKegiatanById = (id: string): Kegiatan | undefined => {
+  const kegiatan = getKegiatan();
+  return kegiatan.find(e => e.id === id);
 };
 
-export const addEvent = (event: Omit<Event, 'id'>) => {
-  const events = getEvents();
-  const newEvent: Event = {
-    ...event,
+export const addKegiatan = (kegiatanItem: Omit<Kegiatan, 'id'>) => {
+  const kegiatan = getKegiatan();
+  const newKegiatan: Kegiatan = {
+    ...kegiatanItem,
     id: Date.now().toString(),
   };
-  events.unshift(newEvent);
-  const success = saveEvents(events);
-  return success ? newEvent : null;
+  kegiatan.unshift(newKegiatan);
+  const success = saveKegiatan(kegiatan);
+  return success ? newKegiatan : null;
 };
 
-export const updateEvent = (id: string, updatedData: Partial<Event>) => {
-  const events = getEvents();
-  const index = events.findIndex(e => e.id === id);
+export const updateKegiatan = (id: string, updatedData: Partial<Kegiatan>) => {
+  const kegiatan = getKegiatan();
+  const index = kegiatan.findIndex(e => e.id === id);
   if (index === -1) return null;
   
-  const updatedEvent = { ...events[index], ...updatedData, id };
-  events[index] = updatedEvent;
-  const success = saveEvents(events);
-  return success ? updatedEvent : null;
+  const updatedKegiatan = { ...kegiatan[index], ...updatedData, id };
+  kegiatan[index] = updatedKegiatan;
+  const success = saveKegiatan(kegiatan);
+  return success ? updatedKegiatan : null;
 };
 
-export const deleteEvent = (id: string) => {
-  const events = getEvents();
-  const filtered = events.filter(e => e.id !== id);
-  if (filtered.length === events.length) return false;
+export const deleteKegiatan = (id: string) => {
+  const kegiatan = getKegiatan();
+  const filtered = kegiatan.filter(e => e.id !== id);
+  if (filtered.length === kegiatan.length) return false;
   
-  return saveEvents(filtered);
+  return saveKegiatan(filtered);
 };
 
 // ==========================================

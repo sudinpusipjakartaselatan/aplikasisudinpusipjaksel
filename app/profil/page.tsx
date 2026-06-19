@@ -1,67 +1,48 @@
 import Image from "next/image";
+import profilImg from "@/database/image/profiles/profil.jpeg";
+import fungsiSudinImg from "@/database/image/profiles/fungsi-sudin.jpeg";
+import fungsiSubbagImg from "@/database/image/profiles/fungsi-subbag.jpeg";
+import fungsiSeksiPerpusImg from "@/database/image/profiles/fungsi-seksi-perpus.jpeg";
+import fungsiSeksiArsipImg from "@/database/image/profiles/fungsi-seksi-arsip.jpeg";
 
 export default function ProfilPage() {
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative w-full h-[400px] md:h-[500px]">
-        <Image
-          src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&q=80&w=1200"
-          alt="Gedung Suku Dinas Perpustakaan"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Profil Kami
-            </h1>
-            <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-              Mengenal lebih dekat Suku Dinas Perpustakaan dan Kearsipan Kota Administrasi Jakarta Selatan.
-            </p>
-          </div>
-        </div>
-      </div>
+  const images = [
+    { src: profilImg, alt: "Profil", color: "from-blue-500 to-indigo-600" },
+    { src: fungsiSudinImg, alt: "Fungsi Sudin", color: "from-teal-400 to-emerald-500" },
+    { src: fungsiSubbagImg, alt: "Fungsi Subbag", color: "from-amber-400 to-orange-500" },
+    { src: fungsiSeksiPerpusImg, alt: "Fungsi Seksi Perpus", color: "from-purple-500 to-pink-500" },
+    { src: fungsiSeksiArsipImg, alt: "Fungsi Seksi Arsip", color: "from-rose-400 to-red-500" },
+  ];
 
-      {/* Content Section */}
-      <div className="container mx-auto px-4 py-16 max-w-5xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
-          <div>
-            <h2 className="text-3xl font-bold text-primary mb-6">Visi & Misi</h2>
-            <div className="space-y-4 text-foreground/80 leading-relaxed">
-              <p>
-                <strong>Visi:</strong> Mewujudkan Jakarta sebagai kota yang maju, lestari, dan berbudaya dengan warga yang sejahtera dan tangguh melalui peningkatan literasi dan pengelolaan arsip yang unggul.
-              </p>
-              <p>
-                <strong>Misi:</strong>
-              </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Meningkatkan kegemaran membaca dan indeks literasi masyarakat.</li>
-                <li>Menyelenggarakan pelayanan perpustakaan yang modern, inklusif, dan berbasis teknologi terapan.</li>
-                <li>Melakukan pembinaan dan pengawasan pengelolaan arsip daerah secara komprehensif.</li>
-                <li>Melestarikan bahan pustaka dan arsip sebagai memori kolektif bangsa.</li>
-              </ul>
+  return (
+    <div className="w-full min-h-screen flex flex-col items-center bg-slate-50 py-16 px-4 sm:px-8">
+      <div className="w-full max-w-4xl flex flex-col gap-16">
+        {images.map((img, index) => (
+          <div 
+            key={index} 
+            className="w-full relative group"
+          >
+            {/* Soft glow effect behind the frame */}
+            <div className={`absolute -inset-2 bg-gradient-to-r ${img.color} rounded-[2.5rem] blur-xl opacity-30 group-hover:opacity-70 transition duration-500`}></div>
+            
+            {/* Colored Frame */}
+            <div className={`relative bg-gradient-to-br ${img.color} p-3 sm:p-5 md:p-6 rounded-[2rem] shadow-2xl group-hover:-translate-y-3 transition-all duration-500 ease-out`}>
+              {/* Inner Image Wrapper */}
+              <div className="relative w-full overflow-hidden rounded-xl md:rounded-2xl shadow-inner border-2 border-white/30 bg-white">
+                <Image 
+                  src={img.src} 
+                  alt={img.alt}
+                  className="w-full h-auto object-cover transform group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  placeholder="blur"
+                  priority={index === 0}
+                />
+              </div>
             </div>
           </div>
-          <div className="relative h-[300px] md:h-[400px] rounded-2xl overflow-hidden shadow-xl">
-            <Image
-              src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=800"
-              alt="Perpustakaan"
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-        </div>
-
-        <div className="bg-primary/5 rounded-3xl p-8 md:p-12 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-6">Tugas dan Fungsi</h2>
-          <p className="text-lg text-foreground/80 max-w-3xl mx-auto leading-relaxed">
-            Suku Dinas Perpustakaan dan Kearsipan Kota Administrasi Jakarta Selatan bertugas menyelenggarakan urusan pemerintahan di bidang perpustakaan dan bidang kearsipan. Kami senantiasa berinovasi untuk memberikan pelayanan prima kepada masyarakat luas, pelajar, mahasiswa, dan pemangku kepentingan lainnya.
-          </p>
-        </div>
+        ))}
       </div>
     </div>
   );
 }
+

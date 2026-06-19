@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Jaga Anak Asli",
+    "date": "9 Januari 2026",
+    "time": "07:00 - 12:00 WIB",
+    "location": "Jakarta",
+    "imageUrl": "/api/images/activity/1781889415427/1781889415477-a3bu13.jpg",
+    "imageUrls": [
+      "/api/images/activity/1781889415427/1781889415477-a3bu13.jpg",
+      "/api/images/activity/1781889415427/1781889415479-vrpzwe.jpg",
+      "/api/images/activity/1781889415427/1781889415482-n7n4vd.jpg",
+      "/api/images/activity/1781889415427/1781889415485-1ofvrq.jpg",
+      "/api/images/activity/1781889415427/1781889415486-2gev2.jpg"
+    ],
+    "description": "Jaga Anak Asli",
+    "id": "1781889415532"
+  },
+  {
+    "title": "Kegiatan Pilah Sampah",
+    "date": "21 Januari 2026",
+    "time": "08:00 - 10:00 WIB",
+    "location": "Jakarta",
+    "imageUrl": "/api/images/activity/1781889091184/1781889091231-s1007.jpg",
+    "imageUrls": [
+      "/api/images/activity/1781889091184/1781889091231-s1007.jpg",
+      "/api/images/activity/1781889091184/1781889091234-8z9c7j.jpg",
+      "/api/images/activity/1781889091184/1781889091236-td3cwn.jpg",
+      "/api/images/activity/1781889091184/1781889091239-10rs1u.jpg",
+      "/api/images/activity/1781889091184/1781889091241-85fbl6.jpg"
+    ],
+    "description": "Kegiatan Pilah Sampah untuk Menyelamatkan Bumi",
+    "id": "1781889091268"
+  },
+  {
+    "title": "Literasi Inklusif Yang Asik di Sekolah Luar Biasa",
+    "date": "11 Januari 2026",
+    "time": "09:00 - 12:00 WIB",
+    "location": "Jakarta",
+    "imageUrl": "/api/images/activity/1781888979978/1781888980010-hpq8uc.jpg",
+    "imageUrls": [
+      "/api/images/activity/1781888979978/1781888980010-hpq8uc.jpg",
+      "/api/images/activity/1781888979978/1781888980013-l76n.jpg",
+      "/api/images/activity/1781888979978/1781888980015-iuig8a.jpg",
+      "/api/images/activity/1781888979978/1781888980018-emzz5h.jpg",
+      "/api/images/activity/1781888979978/1781888980020-0lpjgj.jpg"
+    ],
+    "description": "Kegiatan Literasi Inklusif Yang Asik di Sekolah Luar Biasa",
+    "id": "1781888980050"
+  },
+  {
+    "id": "1778531200000",
+    "title": "HBKB (Hari Bebas Kendaraan Bermotor)",
+    "date": "20 September 2026",
+    "time": "08:00 - 17:00 WIB",
+    "location": "Halaman Utama Kantor Walikota",
+    "imageUrl": "/api/images/activity/1778531200000/1781888855308-omhhc.jpg",
+    "imageUrls": [
+      "/api/images/activity/1778531200000/1781888855308-omhhc.jpg",
+      "/api/images/activity/1778531200000/1781888855312-6glkpf.jpg",
+      "/api/images/activity/1778531200000/1781888855314-8x5wd.jpg",
+      "/api/images/activity/1778531200000/1781888855317-plt7p.jpg",
+      "/api/images/activity/1778531200000/1781888855319-r9bbct.jpg"
+    ],
+    "description": "Perayaan puncak literasi terbesar di Jakarta Selatan. Akan ada bursa buku murah, pertunjukan seni, pameran inovasi perpustakaan, hingga diskusi panel bersama penulis best-seller nasional."
+  }
+]
