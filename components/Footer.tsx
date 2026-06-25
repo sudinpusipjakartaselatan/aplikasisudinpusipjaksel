@@ -36,7 +36,6 @@ const Footer = () => {
             <ul className="space-y-4 text-sm text-slate-300">
               <li><Link href="/profil" className="hover:text-white transition-colors">Tentang Kami</Link></li>
               <li><Link href="/layanan" className="hover:text-white transition-colors">Layanan Perpustakaan</Link></li>
-              <li><Link href="/artikel" className="hover:text-white transition-colors">Layanan Kearsipan</Link></li>
               <li><Link href="/event" className="hover:text-white transition-colors">Agenda Kegiatan</Link></li>
               <li><Link href="/pusling" className="hover:text-white transition-colors">Jadwal Pusling</Link></li>
             </ul>

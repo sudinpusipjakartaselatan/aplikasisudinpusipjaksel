@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Article, Kegiatan, MobileLibrary } from '@/lib/db';
+import { Kegiatan, MobileLibrary } from '@/lib/db';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ImageCropModal from '@/components/ImageCropModal';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'articles' | 'kegiatan' | 'mobile_libraries'>('articles');
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [activeTab, setActiveTab] = useState<'kegiatan' | 'mobile_libraries'>('kegiatan');
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
   const [mobileLibraries, setMobileLibraries] = useState<MobileLibrary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,13 +18,6 @@ export default function AdminDashboard() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Article Form State
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Literasi');
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  
   // Kegiatan Form State
   const [kegiatanTitle, setKegiatanTitle] = useState('');
   const [kegiatanDate, setKegiatanDate] = useState('');
@@ -54,14 +46,12 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [resArticles, resKegiatan, resMobileLibs] = await Promise.all([
-        fetch('/api/articles'),
+      const [resKegiatan, resMobileLibs] = await Promise.all([
         fetch('/api/kegiatan'),
         fetch('/api/mobile-libraries')
       ]);
 
-      if (resArticles.ok && resKegiatan.ok && resMobileLibs.ok) {
-        setArticles(await resArticles.json());
+      if (resKegiatan.ok && resMobileLibs.ok) {
         setKegiatan(await resKegiatan.json());
         setMobileLibraries(await resMobileLibs.json());
       } else {
@@ -83,16 +73,6 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Logout failed:', err);
     }
-  };
-
-  const handleSubmitArticle = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const articleData = { title, category, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), excerpt, content, imageUrl: imageUrl || 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=800' };
-    try {
-      const res = await fetch(editingId ? `/api/articles/${editingId}` : '/api/articles', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(articleData) });
-      if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan artikel');
-    } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
   };
 
   const handleSubmitKegiatan = async (e: React.FormEvent) => {
@@ -143,22 +123,12 @@ export default function AdminDashboard() {
     } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
   };
 
-  const handleEditArticle = (article: Article) => {
-    setEditingId(article.id); setTitle(article.title); setCategory(article.category); setExcerpt(article.excerpt); setContent(article.content); setImageUrl(article.imageUrl); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleEditKegiatan = (kegiatan: Kegiatan) => {
     setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEditMobileLib = (ml: MobileLibrary) => {
     setEditingId(ml.id); setMlTitle(ml.title); setMlDate(ml.date); setMlTime(ml.time); setMlLocation(ml.location); setMlImageUrl(ml.imageUrl); setMlDescription(ml.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleDeleteArticle = async (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus artikel ini?')) {
-      try { const res = await fetch(`/api/articles/${id}`, { method: 'DELETE' }); if (res.ok) fetchData(); else alert('Gagal menghapus artikel'); } catch (err) { console.error(err); }
-    }
   };
 
   const handleDeleteKegiatan = async (id: string) => {
@@ -175,9 +145,7 @@ export default function AdminDashboard() {
 
   const resetForm = () => {
     setEditingId(null);
-    if (activeTab === 'articles') {
-      setTitle(''); setCategory('Literasi'); setExcerpt(''); setContent(''); setImageUrl('');
-    } else if (activeTab === 'kegiatan') {
+    if (activeTab === 'kegiatan') {
       setKegiatanTitle(''); setKegiatanDate(''); setKegiatanTime(''); setKegiatanLocation(''); setKegiatanImageUrls(''); setKegiatanFiles([]); setUploadMethod('url'); setKegiatanDescription(''); setCropImageSrc(''); setIsCropModalOpen(false);
     } else {
       setMlTitle(''); setMlDate(''); setMlTime(''); setMlLocation(''); setMlImageUrl(''); setMlDescription('');
@@ -211,11 +179,6 @@ export default function AdminDashboard() {
           </Link>
         </div>
         <nav className="space-y-4 flex-grow w-full">
-          <button onClick={() => { setActiveTab('articles'); setShowAddForm(false); resetForm(); }} className={`w-full p-3 rounded-xl font-bold flex items-center cursor-pointer border shadow-inner transition-all justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'} ${activeTab === 'articles' ? 'bg-white/10 text-secondary border-white/5' : 'hover:bg-white/5 text-slate-300 hover:text-white border-transparent'}`}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
-            <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 ml-3 w-auto ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0 md:ml-0'}`}>Kelola Artikel</span>
-          </button>
-
           <button onClick={() => { setActiveTab('kegiatan'); setShowAddForm(false); resetForm(); }} className={`w-full p-3 rounded-xl font-bold flex items-center cursor-pointer border shadow-inner transition-all justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'} ${activeTab === 'kegiatan' ? 'bg-white/10 text-secondary border-white/5' : 'hover:bg-white/5 text-slate-300 hover:text-white border-transparent'}`}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
             <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap opacity-100 ml-3 w-auto ${isDesktopSidebarOpen ? '' : 'md:opacity-0 md:w-0 md:ml-0'}`}>Kelola Kegiatan</span>
@@ -253,8 +216,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-6 md:p-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1 md:mb-2">
-                {activeTab === 'articles' ? 'Daftar Artikel' : activeTab === 'kegiatan' ? 'Daftar Kegiatan' : 'Daftar Pusling'}
+                {activeTab === 'kegiatan' ? 'Daftar Kegiatan' : 'Daftar Pusling'}
               </h1>
               <p className="text-sm md:text-base text-slate-500">Kelola konten yang muncul di halaman utama website</p>
             </div>
@@ -262,29 +224,10 @@ export default function AdminDashboard() {
               {showAddForm ? (
                 <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Batal</>
               ) : (
-                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'articles' ? 'Tambah Artikel Baru' : activeTab === 'kegiatan' ? 'Tambah Kegiatan Baru' : 'Tambah Jadwal Pusling'}</>
+                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'kegiatan' ? 'Tambah Kegiatan Baru' : 'Tambah Jadwal Pusling'}</>
               )}
             </button>
           </div>
-
-          {showAddForm && activeTab === 'articles' && (
-            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 mb-8 md:mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center gap-3 mb-6 md:mb-8 pb-4 border-b border-slate-50">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></div>
-                <h3 className="text-lg md:text-xl font-bold text-primary">{editingId ? 'Edit Artikel' : 'Form Input Artikel'}</h3>
-              </div>
-              <form onSubmit={handleSubmitArticle} className="space-y-6 md:space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Judul Artikel</label><input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Kunjungan Literasi..." required /></div>
-                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Kategori Konten</label><select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all bg-white text-slate-600 font-medium"><option>Literasi</option><option>Kearsipan</option><option>Penghargaan</option><option>Event</option></select></div>
-                </div>
-                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Ringkasan Pendek</label><textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all h-24 text-slate-600 font-medium resize-none" placeholder="Tuliskan 1-2 kalimat ringkasan berita..." required /></div>
-                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Isi Artikel Lengkap</label><textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all h-40 md:h-56 text-slate-600 font-medium resize-none" placeholder="Tuliskan seluruh isi berita..." required /></div>
-                <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tautan Gambar (Unsplash/URL)</label><div className="flex flex-col sm:flex-row gap-4"><input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="flex-1 px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="https://..." /><div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center shrink-0 overflow-hidden bg-slate-50">{imageUrl ? <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-300"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>}</div></div></div>
-                <div className="flex gap-4 pt-4"><button type="submit" disabled={isSubmitting} className={`flex-1 py-4 md:py-5 rounded-2xl font-extrabold text-white transition-all shadow-lg text-sm md:text-base flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-light hover:-translate-y-1 active:translate-y-0 shadow-primary/20'}`}>{isSubmitting ? <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses Data...</> : (editingId ? 'Simpan Perubahan' : 'Publikasikan Artikel')}</button></div>
-              </form>
-            </div>
-          )}
 
           {showAddForm && activeTab === 'kegiatan' && (
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 mb-8 md:mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -392,10 +335,10 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
             <div className="px-6 md:px-8 py-5 md:py-6 bg-slate-50/50 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <h3 className="font-bold text-primary">
-                Data {activeTab === 'articles' ? 'Artikel' : activeTab === 'kegiatan' ? 'Kegiatan' : 'Jadwal Pusling'} Terdaftar
+                Data {activeTab === 'kegiatan' ? 'Kegiatan' : 'Jadwal Pusling'} Terdaftar
               </h3>
               <span className="text-xs font-bold text-slate-400 bg-white px-3 py-1 rounded-full border border-slate-100">
-                Total: {activeTab === 'articles' ? articles.length : activeTab === 'kegiatan' ? kegiatan.length : mobileLibraries.length} Data
+                Total: {activeTab === 'kegiatan' ? kegiatan.length : mobileLibraries.length} Data
               </span>
             </div>
             
@@ -405,25 +348,15 @@ export default function AdminDashboard() {
                   <tr className="border-b border-slate-50">
                     <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Konten</th>
                     <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      {activeTab === 'articles' ? 'Kategori' : 'Lokasi'}
+                      Lokasi
                     </th>
                     <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      {activeTab === 'articles' ? 'Waktu Rilis' : 'Jadwal'}
+                      Jadwal
                     </th>
                     <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Kelola</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {activeTab === 'articles' && articles.map((article) => (
-                    <tr key={article.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-6 md:px-8 py-4 md:py-6">
-                        <div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner">{article.imageUrl && <img src={article.imageUrl} alt="" className="w-full h-full object-cover" />}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{article.title}</div></div></div>
-                      </td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><span className="px-2 md:px-3 py-1 bg-primary/5 text-primary rounded-lg text-[10px] font-bold uppercase tracking-wider border border-primary/10">{article.category}</span></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium">{article.date}</td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditArticle(article)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteArticle(article.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
-                    </tr>
-                  ))}
 
                   {activeTab === 'kegiatan' && kegiatan.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">

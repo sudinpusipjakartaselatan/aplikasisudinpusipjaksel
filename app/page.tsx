@@ -1,13 +1,11 @@
 import Hero from '@/components/Hero';
-import ArticleCard from '@/components/ArticleCard';
 import EventCard from '@/components/EventCard';
 import KegiatanCard from '@/components/KegiatanCard';
 import MobileLibraryCard from '@/components/MobileLibraryCard';
-import { getArticles, getKegiatan, getMobileLibraries } from '@/lib/db';
+import { getKegiatan, getMobileLibraries } from '@/lib/db';
 import Link from 'next/link';
 
 export default async function Home() {
-  const articles = getArticles().slice(0, 4); // Show only top 4
   const kegiatan = getKegiatan().slice(0, 4); // Show only top 4 kegiatan
   const mobileLibraries = getMobileLibraries().slice(0, 4); // Show only top 4
 
@@ -16,47 +14,6 @@ export default async function Home() {
     <div className="overflow-x-hidden">
       <Hero />
       
-      <section className="py-16 md:py-24 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6 text-center md:text-left">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-bold text-heading-text mb-4">
-                <span className="text-secondary">Artikel</span> Terbaru
-              </h2>
-              <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                Ikuti perkembangan terbaru mengenai kegiatan literasi, layanan kearsipan, dan berbagai agenda menarik lainnya di wilayah Jakarta Selatan.
-              </p>
-            </div>
-            <Link href="/artikel" className="text-sm font-bold text-heading-text hover:text-blue-500 transition-colors flex items-center gap-2 pb-1 border-b-2 border-primary-light/20 hover:border-blue-500">
-              Lihat Semua Artikel
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {articles.length > 0 ? (
-              articles.map((article) => (
-                <ArticleCard 
-                  key={article.id}
-                  id={article.id}
-                  title={article.title}
-                  category={article.category}
-                  date={article.date}
-                  excerpt={article.excerpt}
-                  imageUrl={article.imageUrl}
-                />
-              ))
-            ) : (
-              <div className="col-span-full py-20 text-center text-muted-foreground">
-                Belum ada artikel terbaru.
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* Events Section */}
       <section className="py-16 md:py-24 bg-muted/50 border-t border-border">
         <div className="container mx-auto px-4 md:px-6">

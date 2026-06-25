@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getArticles, addArticle } from '@/lib/db';
 
 export async function GET() {
-  const articles = getArticles();
-  return NextResponse.json(articles);
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const newArticle = addArticle(body);
-    return NextResponse.json(newArticle, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create article' }, { status: 400 });
-  }
+export async function POST() {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
+}
+
+export async function PUT() {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
+}
+
+export async function DELETE() {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
