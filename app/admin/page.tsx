@@ -206,7 +206,7 @@ export default function AdminDashboard() {
         <div className={`mb-12 flex items-start w-full justify-start ${isDesktopSidebarOpen ? '' : 'md:justify-center'}`}>
           <Link href="/" className="flex items-center justify-center">
             <div className={`h-8 shrink-0 ${isDesktopSidebarOpen ? 'md:h-10' : 'md:h-8'}`}>
-              <img src="/api/images/logo/logo-sudin-pusip.jpeg" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
+              <img src="/api/images/logo/logo-sudin-pusip.png" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
             </div>
           </Link>
         </div>

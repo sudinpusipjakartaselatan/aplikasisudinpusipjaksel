@@ -37,7 +37,7 @@ const Header = () => {
       <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <div className="h-8 md:h-10 shrink-0">
-            <img src="/api/images/logo/logo-sudin-pusip.jpeg" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
+            <img src="/api/images/logo/logo-sudin-pusip.png" alt="Logo Sudin Pusip" className="h-full w-auto object-contain" />
           </div>
         </Link>
 
