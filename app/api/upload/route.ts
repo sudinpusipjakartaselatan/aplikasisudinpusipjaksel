@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { cookies } from 'next/headers';
+import { put } from '@vercel/blob';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -24,30 +25,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing idKegiatan' }, { status: 400 });
     }
 
-    const uploadDir = path.join(process.cwd(), 'database', 'image', 'activity', idKegiatan);
-    
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     const uploadedUrls: string[] = [];
+    const useBlob = !!process.env.BLOB_READ_WRITE_TOKEN;
 
     for (const file of files) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      // Sanitize filename
       const originalName = file.name;
       const extension = path.extname(originalName);
       const safeName = `${Date.now()}-${Math.random().toString(36).substring(7)}${extension}`;
-      
-      const filePath = path.join(uploadDir, safeName);
-      fs.writeFileSync(filePath, buffer);
-      
-      // We will serve this via our new /api/images endpoint
-      const fileUrl = `/api/images/activity/${idKegiatan}/${safeName}`;
-      uploadedUrls.push(fileUrl);
+
+      if (useBlob) {
+        // Upload to Vercel Blob
+        const blob = await put(`activity/${idKegiatan}/${safeName}`, file, {
+          access: 'public',
+        });
+        uploadedUrls.push(blob.url);
+      } else {
+        // Fallback to local fs (for local development without Vercel Blob)
+        if (process.env.VERCEL) {
+          throw new Error('Cannot upload files to Vercel without BLOB_READ_WRITE_TOKEN');
+        }
+
+        const uploadDir = path.join(process.cwd(), 'database', 'image', 'activity', idKegiatan);
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const filePath = path.join(uploadDir, safeName);
+        fs.writeFileSync(filePath, buffer);
+        
+        const fileUrl = `/api/images/activity/${idKegiatan}/${safeName}`;
+        uploadedUrls.push(fileUrl);
+      }
     }
 
     return NextResponse.json({ success: true, urls: uploadedUrls });
