@@ -216,6 +216,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-6 md:p-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
             <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
                 {activeTab === 'kegiatan' ? 'Daftar Kegiatan' : 'Daftar Pusling'}
               </h1>
               <p className="text-sm md:text-base text-slate-500">Kelola konten yang muncul di halaman utama website</p>
