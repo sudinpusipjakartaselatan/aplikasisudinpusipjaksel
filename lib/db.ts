@@ -36,14 +36,18 @@ export interface MobileLibrary {
 
 // Check if Upstash Redis credentials exist in environment
 const useRedis = () => {
-  return !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+  return (!!process.env.KV_REST_API_URL && !!process.env.KV_REST_API_TOKEN) || 
+         (!!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN);
 };
 
 // Initialize Redis safely
 let redis: Redis | null = null;
 try {
   if (useRedis()) {
-    redis = Redis.fromEnv();
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || '',
+      token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '',
+    });
   }
 } catch (e) {
   console.warn('Failed to initialize Redis:', e);
