@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Data must be an array' }, { status: 400 });
     }
 
-    const newItems = addBulkKegiatan(data);
+    const newItems = await addBulkKegiatan(data);
     
     if (newItems) {
       return NextResponse.json({ success: true, count: newItems.length });

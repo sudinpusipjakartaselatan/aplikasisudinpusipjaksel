@@ -3,7 +3,7 @@ import { getKegiatan, addKegiatan } from '@/lib/db';
 import { cookies } from 'next/headers';
 
 export async function GET() {
-  const kegiatan = getKegiatan();
+  const kegiatan = await getKegiatan();
   return NextResponse.json(kegiatan);
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   try {
     const data = await request.json();
-    const newKegiatan = addKegiatan(data);
+    const newKegiatan = await addKegiatan(data);
     
     if (newKegiatan) {
       return NextResponse.json({ success: true, event: newKegiatan }); // Keep event to avoid changing admin dashboard too much at once

@@ -3,7 +3,7 @@ import { getMobileLibraries, addMobileLibrary } from '@/lib/db';
 import { cookies } from 'next/headers';
 
 export async function GET() {
-  const libraries = getMobileLibraries();
+  const libraries = await getMobileLibraries();
   return NextResponse.json(libraries);
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   try {
     const data = await request.json();
-    const newLibrary = addMobileLibrary(data);
+    const newLibrary = await addMobileLibrary(data);
     
     if (newLibrary) {
       return NextResponse.json({ success: true, library: newLibrary });

@@ -13,7 +13,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   try {
     const data = await request.json();
     const params = await context.params;
-    const updatedKegiatan = updateKegiatan(params.id, data);
+    const updatedKegiatan = await updateKegiatan(params.id, data);
     
     if (updatedKegiatan) {
       return NextResponse.json({ success: true, event: updatedKegiatan });
@@ -34,7 +34,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   }
 
   const params = await context.params;
-  const success = deleteKegiatan(params.id);
+  const success = await deleteKegiatan(params.id);
   
   if (success) {
     return NextResponse.json({ success: true });

@@ -13,7 +13,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   try {
     const data = await request.json();
     const params = await context.params;
-    const updatedLibrary = updateMobileLibrary(params.id, data);
+    const updatedLibrary = await updateMobileLibrary(params.id, data);
     
     if (updatedLibrary) {
       return NextResponse.json({ success: true, library: updatedLibrary });
@@ -34,7 +34,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   }
 
   const params = await context.params;
-  const success = deleteMobileLibrary(params.id);
+  const success = await deleteMobileLibrary(params.id);
   
   if (success) {
     return NextResponse.json({ success: true });
