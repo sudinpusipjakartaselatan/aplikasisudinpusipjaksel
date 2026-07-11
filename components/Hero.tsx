@@ -48,8 +48,8 @@ const Hero = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[10px] md:text-xs text-muted-foreground font-medium">Buku Tersedia</p>
-                  <p className="text-lg md:text-xl font-bold text-heading-text">50.000+</p>
+                  <p className="text-[10px] md:text-xs text-muted-foreground font-medium">Ayo Membaca!</p>
+                  <p className="text-lg md:text-xl font-bold text-heading-text">Perluas Wawasan</p>
                 </div>
               </div>
             </div>
