@@ -6,8 +6,8 @@ import { getKegiatan, getMobileLibraries } from '@/lib/db';
 import Link from 'next/link';
 
 export default async function Home() {
-  const kegiatan = getKegiatan().slice(0, 4); // Show only top 4 kegiatan
-  const mobileLibraries = getMobileLibraries().slice(0, 4); // Show only top 4
+  const kegiatan = (await getKegiatan()).slice(0, 4); // Show only top 4 kegiatan
+  const mobileLibraries = (await getMobileLibraries()).slice(0, 4); // Show only top 4
 
 
   return (

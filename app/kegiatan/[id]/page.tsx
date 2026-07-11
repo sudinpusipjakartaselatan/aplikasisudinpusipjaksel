@@ -10,7 +10,7 @@ export default async function KegiatanDetailPage({
   params: Promise<{ id: string }>
 }) {
   const resolvedParams = await params;
-  const kegiatan = getKegiatanById(resolvedParams.id);
+  const kegiatan = await getKegiatanById(resolvedParams.id);
 
   if (!kegiatan) {
     notFound();

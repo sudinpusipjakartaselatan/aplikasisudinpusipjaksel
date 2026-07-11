@@ -13,7 +13,7 @@ export default async function PuslingPage({
   const currentPage = isNaN(page) || page < 1 ? 1 : page;
   
   const ITEMS_PER_PAGE = 6;
-  const allLibraries = getMobileLibraries();
+  const allLibraries = await getMobileLibraries();
   const totalPages = Math.ceil(allLibraries.length / ITEMS_PER_PAGE);
   
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

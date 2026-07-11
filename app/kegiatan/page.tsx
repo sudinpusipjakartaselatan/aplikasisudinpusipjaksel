@@ -13,7 +13,7 @@ export default async function KegiatanPage({
   const currentPage = isNaN(page) || page < 1 ? 1 : page;
   
   const ITEMS_PER_PAGE = 6;
-  const allKegiatan = getKegiatan();
+  const allKegiatan = await getKegiatan();
   const totalPages = Math.ceil(allKegiatan.length / ITEMS_PER_PAGE);
   
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
