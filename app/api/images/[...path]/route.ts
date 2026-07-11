@@ -6,7 +6,7 @@ export async function GET(request: Request, context: { params: Promise<{ path: s
   try {
     const params = await context.params;
     // Prevent directory traversal
-    const safePathSegments = params.path.filter(p => !p.includes('..'));
+    const safePathSegments = params.path.map(decodeURIComponent).filter(p => !p.includes('..'));
     const imagePath = path.join(process.cwd(), 'database', 'image', ...safePathSegments);
 
     if (!fs.existsSync(imagePath)) {
@@ -23,7 +23,7 @@ export async function GET(request: Request, context: { params: Promise<{ path: s
     else if (ext === '.webp') contentType = 'image/webp';
     else if (ext === '.svg') contentType = 'image/svg+xml';
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',
