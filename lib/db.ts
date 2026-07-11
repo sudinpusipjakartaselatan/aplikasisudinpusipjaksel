@@ -22,7 +22,7 @@ export interface Kegiatan {
   description: string;
   namaInstansi?: string;
   jumlahSnack?: number;
-  jumlahPeserta?: number;
+  jumlahPeserta?: string | number;
   namaNarasumber?: string;
   timPelaksana?: string;
   guru?: string;
@@ -69,6 +69,18 @@ export const addKegiatan = (kegiatanItem: Omit<Kegiatan, 'id'>) => {
   kegiatan.unshift(newKegiatan);
   const success = saveKegiatan(kegiatan);
   return success ? newKegiatan : null;
+};
+
+export const addBulkKegiatan = (kegiatanItems: Omit<Kegiatan, 'id'>[]) => {
+  const kegiatan = getKegiatan();
+  const newItems = kegiatanItems.map((item, index) => ({
+    ...item,
+    id: (Date.now() + index).toString(),
+  }));
+  // Unshift items to the front, but keep their relative order from the excel (oldest last)
+  kegiatan.unshift(...newItems);
+  const success = saveKegiatan(kegiatan);
+  return success ? newItems : null;
 };
 
 export const updateKegiatan = (id: string, updatedData: Partial<Kegiatan>) => {

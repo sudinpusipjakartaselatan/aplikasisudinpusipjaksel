@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Kegiatan, MobileLibrary } from '@/lib/db';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ImageCropModal from '@/components/ImageCropModal';
+import * as XLSX from 'xlsx';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'kegiatan' | 'mobile_libraries'>('kegiatan');
@@ -16,7 +17,25 @@ export default function AdminDashboard() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  type ModalState = {
+    isOpen: boolean;
+    type: 'success' | 'error' | 'confirm';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  };
+  const [modal, setModal] = useState<ModalState>({ isOpen: false, type: 'success', title: '', message: '' });
+
+  const showAlert = (type: 'success' | 'error', title: string, message: string) => {
+    setModal({ isOpen: true, type, title, message });
+  };
+
+  const showConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setModal({ isOpen: true, type: 'confirm', title, message, onConfirm });
+  };
 
   // Kegiatan Form State
   const [kegiatanTitle, setKegiatanTitle] = useState('');
@@ -47,6 +66,93 @@ export default function AdminDashboard() {
   const [mlDescription, setMlDescription] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsSubmitting(true);
+    
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      
+      if (!jsonData || jsonData.length === 0) {
+        showAlert('error', 'Gagal Import', 'File Excel kosong atau format tidak sesuai');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      const mappedData = jsonData.map((row: any) => ({
+        title: row['Judul Kegiatan'] || '',
+        date: row['Tanggal'] || '',
+        time: row['Waktu'] || '',
+        location: row['Lokasi'] || '',
+        description: row['Deskripsi'] || '',
+        imageUrl: row['Gambar'] || '',
+        imageUrls: row['Gambar'] ? [row['Gambar']] : [],
+        namaInstansi: row['Instansi'] || '',
+        namaNarasumber: row['Narasumber'] || '',
+        timPelaksana: row['Tim Pelaksana'] || '',
+        guru: row['Guru'] || '',
+        jenisKelamin: row['L/P'] || '',
+        usia: row['Usia'] ? String(row['Usia']) : '',
+        jumlahPeserta: row['Peserta'] ? String(row['Peserta']) : '',
+        jumlahSnack: row['Snack'] ? Number(row['Snack']) : undefined,
+      }));
+      
+      const res = await fetch('/api/kegiatan/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mappedData)
+      });
+      
+      if (res.ok) {
+        showAlert('success', 'Berhasil', `Berhasil mengimpor ${mappedData.length} kegiatan`);
+        fetchData();
+      } else {
+        showAlert('error', 'Gagal', 'Gagal mengimpor data');
+      }
+    } catch (error) {
+      console.error(error);
+      showAlert('error', 'Error', 'Terjadi kesalahan saat memproses file Excel');
+    } finally {
+      setIsSubmitting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDownloadExcel = () => {
+    if (kegiatan.length === 0) {
+      showAlert('error', 'Gagal', 'Tidak ada data kegiatan untuk diunduh');
+      return;
+    }
+
+    const dataToExport = kegiatan.map((item) => ({
+      'Judul Kegiatan': item.title,
+      'Tanggal': item.date,
+      'Waktu': item.time,
+      'Lokasi': item.location,
+      'Deskripsi': item.description,
+      'Gambar': item.imageUrl || '',
+      'Instansi': item.namaInstansi || '',
+      'Narasumber': item.namaNarasumber || '',
+      'Tim Pelaksana': item.timPelaksana || '',
+      'Guru': item.guru || '',
+      'Peserta': item.jumlahPeserta || '',
+      'Snack': item.jumlahSnack || '',
+      'L/P': item.jenisKelamin || '',
+      'Usia': item.usia || ''
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Kegiatan");
+    
+    XLSX.writeFile(workbook, "Data_Kegiatan_Sudin_Pusip_Jaksel.xlsx");
+  };
 
   useEffect(() => {
     fetchData();
@@ -94,42 +200,42 @@ export default function AdminDashboard() {
        const tempId = editingId || Date.now().toString();
        formData.append('idKegiatan', tempId);
        
-       try {
-         const resUpload = await fetch('/api/upload', { method: 'POST', body: formData });
-         if (resUpload.ok) {
-            const data = await resUpload.json();
-            parsedUrls = [...parsedUrls, ...data.urls];
-         } else {
-            const data = await resUpload.json();
-            alert('Gagal upload gambar: ' + (data.error || resUpload.statusText));
-            setIsSubmitting(false);
-            return;
+         try {
+           const resUpload = await fetch('/api/upload', { method: 'POST', body: formData });
+           if (resUpload.ok) {
+              const data = await resUpload.json();
+              parsedUrls = [...parsedUrls, ...data.urls];
+           } else {
+              const data = await resUpload.json();
+              showAlert('error', 'Gagal', 'Gagal upload gambar: ' + (data.error || resUpload.statusText));
+              setIsSubmitting(false);
+              return;
+           }
+         } catch (err) {
+           console.error(err);
+           showAlert('error', 'Gagal', 'Gagal upload gambar');
+           setIsSubmitting(false);
+           return;
          }
-       } catch (err) {
-         console.error(err);
-         alert('Gagal upload gambar');
-         setIsSubmitting(false);
-         return;
-       }
-    }
-
-    const mainImageUrl = parsedUrls.length > 0 ? parsedUrls[0] : '';
-    const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription, namaInstansi: kegiatanNamaInstansi, jumlahSnack: kegiatanJumlahSnack ? Number(kegiatanJumlahSnack) : undefined, jumlahPeserta: kegiatanJumlahPeserta ? Number(kegiatanJumlahPeserta) : undefined, namaNarasumber: kegiatanNamaNarasumber, timPelaksana: kegiatanTimPelaksana, guru: kegiatanGuru, jenisKelamin: kegiatanJenisKelamin, usia: kegiatanUsia };
-    try {
-      const res = await fetch(editingId ? `/api/kegiatan/${editingId}` : '/api/kegiatan', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kegiatanData) });
-      if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan kegiatan');
-    } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
-  };
-
-  const handleSubmitMobileLib = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const mlData = { title: mlTitle, date: mlDate, time: mlTime, location: mlLocation, imageUrl: mlImageUrl, description: mlDescription };
-    try {
-      const res = await fetch(editingId ? `/api/mobile-libraries/${editingId}` : '/api/mobile-libraries', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mlData) });
-      if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan jadwal pusling');
-    } catch (err) { console.error(err); alert('Terjadi kesalahan'); } finally { setIsSubmitting(false); }
-  };
+      }
+  
+      const mainImageUrl = parsedUrls.length > 0 ? parsedUrls[0] : '';
+      const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription, namaInstansi: kegiatanNamaInstansi, jumlahSnack: kegiatanJumlahSnack ? Number(kegiatanJumlahSnack) : undefined, jumlahPeserta: kegiatanJumlahPeserta, namaNarasumber: kegiatanNamaNarasumber, timPelaksana: kegiatanTimPelaksana, guru: kegiatanGuru, jenisKelamin: kegiatanJenisKelamin, usia: kegiatanUsia };
+      try {
+        const res = await fetch(editingId ? `/api/kegiatan/${editingId}` : '/api/kegiatan', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kegiatanData) });
+        if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); showAlert('success', 'Berhasil', 'Kegiatan berhasil disimpan'); } else showAlert('error', 'Gagal', 'Gagal menyimpan kegiatan');
+      } catch (err) { console.error(err); showAlert('error', 'Error', 'Terjadi kesalahan'); } finally { setIsSubmitting(false); }
+    };
+  
+    const handleSubmitMobileLib = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+      const mlData = { title: mlTitle, date: mlDate, time: mlTime, location: mlLocation, imageUrl: mlImageUrl, description: mlDescription };
+      try {
+        const res = await fetch(editingId ? `/api/mobile-libraries/${editingId}` : '/api/mobile-libraries', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mlData) });
+        if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); showAlert('success', 'Berhasil', 'Jadwal pusling berhasil disimpan'); } else showAlert('error', 'Gagal', 'Gagal menyimpan jadwal pusling');
+      } catch (err) { console.error(err); showAlert('error', 'Error', 'Terjadi kesalahan'); } finally { setIsSubmitting(false); }
+    };
 
   const handleEditKegiatan = (kegiatan: Kegiatan) => {
     setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setKegiatanNamaInstansi(kegiatan.namaInstansi || ''); setKegiatanJumlahSnack(kegiatan.jumlahSnack ? String(kegiatan.jumlahSnack) : ''); setKegiatanJumlahPeserta(kegiatan.jumlahPeserta ? String(kegiatan.jumlahPeserta) : ''); setKegiatanNamaNarasumber(kegiatan.namaNarasumber || ''); setKegiatanTimPelaksana(kegiatan.timPelaksana || ''); setKegiatanGuru(kegiatan.guru || ''); setKegiatanJenisKelamin(kegiatan.jenisKelamin || ''); setKegiatanUsia(kegiatan.usia || ''); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -139,16 +245,16 @@ export default function AdminDashboard() {
     setEditingId(ml.id); setMlTitle(ml.title); setMlDate(ml.date); setMlTime(ml.time); setMlLocation(ml.location); setMlImageUrl(ml.imageUrl); setMlDescription(ml.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeleteKegiatan = async (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus kegiatan ini?')) {
-      try { const res = await fetch(`/api/kegiatan/${id}`, { method: 'DELETE' }); if (res.ok) fetchData(); else alert('Gagal menghapus kegiatan'); } catch (err) { console.error(err); }
-    }
+  const handleDeleteKegiatan = (id: string) => {
+    showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus kegiatan ini?', async () => {
+      try { const res = await fetch(`/api/kegiatan/${id}`, { method: 'DELETE' }); if (res.ok) { fetchData(); showAlert('success', 'Berhasil', 'Kegiatan berhasil dihapus'); } else showAlert('error', 'Gagal', 'Gagal menghapus kegiatan'); } catch (err) { console.error(err); showAlert('error', 'Error', 'Terjadi kesalahan'); }
+    });
   };
 
-  const handleDeleteMobileLib = async (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus jadwal pusling ini?')) {
-      try { const res = await fetch(`/api/mobile-libraries/${id}`, { method: 'DELETE' }); if (res.ok) fetchData(); else alert('Gagal menghapus pusling'); } catch (err) { console.error(err); }
-    }
+  const handleDeleteMobileLib = (id: string) => {
+    showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus jadwal pusling ini?', async () => {
+      try { const res = await fetch(`/api/mobile-libraries/${id}`, { method: 'DELETE' }); if (res.ok) { fetchData(); showAlert('success', 'Berhasil', 'Pusling berhasil dihapus'); } else showAlert('error', 'Gagal', 'Gagal menghapus pusling'); } catch (err) { console.error(err); showAlert('error', 'Error', 'Terjadi kesalahan'); }
+    });
   };
 
   const resetForm = () => {
@@ -229,13 +335,26 @@ export default function AdminDashboard() {
               </h1>
               <p className="text-sm md:text-base text-slate-500">Kelola konten yang muncul di halaman utama website</p>
             </div>
-            <button onClick={() => { if (showAddForm) { setShowAddForm(false); resetForm(); } else { resetForm(); setShowAddForm(true); } }} className="w-full md:w-auto bg-primary text-white px-6 md:px-8 py-3 md:py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all shadow-xl hover:shadow-primary/20">
-              {showAddForm ? (
-                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Batal</>
-              ) : (
-                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'kegiatan' ? 'Tambah Kegiatan Baru' : 'Tambah Jadwal Pusling'}</>
+            <div className="flex w-full md:w-auto gap-3 flex-col sm:flex-row">
+              {activeTab === 'kegiatan' && !showAddForm && (
+                <>
+                  <button onClick={handleDownloadExcel} className="w-full sm:w-auto bg-slate-800 text-white px-6 md:px-8 py-3 md:py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-700 transition-all shadow-xl hover:shadow-slate-800/20">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Excel
+                  </button>
+                  <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
+                  <button onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto bg-green-500 text-white px-6 md:px-8 py-3 md:py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl hover:shadow-green-500/20" disabled={isSubmitting}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Import Excel
+                  </button>
+                </>
               )}
-            </button>
+              <button onClick={() => { if (showAddForm) { setShowAddForm(false); resetForm(); } else { resetForm(); setShowAddForm(true); } }} className="w-full sm:w-auto bg-primary text-white px-6 md:px-8 py-3 md:py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all shadow-xl hover:shadow-primary/20">
+                {showAddForm ? (
+                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg> Batal</>
+                ) : (
+                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> {activeTab === 'kegiatan' ? 'Tambah Kegiatan Baru' : 'Tambah Jadwal Pusling'}</>
+                )}
+              </button>
+            </div>
           </div>
 
           {showAddForm && activeTab === 'kegiatan' && (
@@ -309,7 +428,7 @@ export default function AdminDashboard() {
                   <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tim Pelaksana</label><input type="text" value={kegiatanTimPelaksana} onChange={(e) => setKegiatanTimPelaksana(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Tim pelaksana..." /></div>
                   <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Guru Pendamping</label><input type="text" value={kegiatanGuru} onChange={(e) => setKegiatanGuru(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Nama Guru..." /></div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Jumlah Peserta</label><input type="number" value={kegiatanJumlahPeserta} onChange={(e) => setKegiatanJumlahPeserta(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="0" min="0" /></div>
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Jumlah Peserta</label><input type="text" value={kegiatanJumlahPeserta} onChange={(e) => setKegiatanJumlahPeserta(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Misal: 50 orang" /></div>
                     <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Jumlah Snack</label><input type="number" value={kegiatanJumlahSnack} onChange={(e) => setKegiatanJumlahSnack(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="0" min="0" /></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -368,42 +487,108 @@ export default function AdminDashboard() {
             
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[600px]">
-                <thead>
-                  <tr className="border-b border-slate-50">
-                    <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Konten</th>
-                    <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      Lokasi
-                    </th>
-                    <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                      Jadwal
-                    </th>
-                    <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Kelola</th>
+                <thead className="bg-slate-50 border-y border-slate-200">
+                  <tr>
+                    <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Detail Konten</th>
+                    <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Lokasi</th>
+                    <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Jadwal</th>
+                    <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide text-right">Kelola</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
-
+                <tbody className="divide-y divide-slate-100 bg-white">
                   {activeTab === 'kegiatan' && kegiatan.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner flex items-center justify-center">{item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{item.title}</div></div></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{item.location}</span>{item.namaInstansi && <span className="text-[10px] text-slate-400 font-medium truncate max-w-[150px]">Instansi: {item.namaInstansi}</span>}</div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium"><div className="flex flex-col gap-0.5"><span className="text-slate-700 font-bold">{item.date}</span><span>{item.time}</span></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditKegiatan(item)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteKegiatan(item.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
+                    <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                      <td className="px-5 md:px-6 py-4 md:py-5">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm flex items-center justify-center border border-slate-200">
+                            {item.imageUrl ? (
+                              <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                            )}
+                          </div>
+                          <div className="flex flex-col min-w-0 pt-0.5">
+                            <span className="font-bold text-slate-800 text-sm md:text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors">{item.title}</span>
+                            {item.description && <span className="text-xs text-slate-500 mt-1 line-clamp-1">{item.description}</span>}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-semibold text-slate-700 whitespace-pre-wrap">{item.location}</span>
+                          {item.namaInstansi && <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md w-fit">Instansi: {item.namaInstansi}</span>}
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-bold text-slate-800">{item.date}</span>
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            {item.time}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-middle text-right">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => handleEditKegiatan(item)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-amber-100 hover:text-amber-600 transition-all bg-white border border-slate-200 hover:border-amber-200" title="Edit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                          </button>
+                          <button onClick={() => handleDeleteKegiatan(item.id)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all bg-white border border-slate-200 hover:border-red-200" title="Hapus">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
 
                   {activeTab === 'mobile_libraries' && mobileLibraries.map((ml) => (
-                    <tr key={ml.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner flex items-center justify-center">{ml.imageUrl ? <img src={ml.imageUrl} alt="" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-slate-400"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-1.1 0-2 .9-2 2v8c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" /></svg>}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{ml.title}</div></div></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{ml.location}</span></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium"><div className="flex flex-col gap-0.5"><span className="text-slate-700 font-bold">{ml.date}</span><span>{ml.time}</span></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditMobileLib(ml)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteMobileLib(ml.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
+                    <tr key={ml.id} className="hover:bg-slate-50 transition-colors group">
+                      <td className="px-5 md:px-6 py-4 md:py-5">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm flex items-center justify-center border border-slate-200">
+                            {ml.imageUrl ? (
+                              <img src={ml.imageUrl} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-400"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-1.1 0-2 .9-2 2v8c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" /></svg>
+                            )}
+                          </div>
+                          <div className="flex flex-col min-w-0 pt-0.5">
+                            <span className="font-bold text-slate-800 text-sm md:text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors">{ml.title}</span>
+                            {ml.description && <span className="text-xs text-slate-500 mt-1 line-clamp-1">{ml.description}</span>}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-semibold text-slate-700 whitespace-pre-wrap">{ml.location}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-bold text-slate-800">{ml.date}</span>
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            {ml.time}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-6 py-4 md:py-5 align-middle text-right">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => handleEditMobileLib(ml)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-amber-100 hover:text-amber-600 transition-all bg-white border border-slate-200 hover:border-amber-200" title="Edit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                          </button>
+                          <button onClick={() => handleDeleteMobileLib(ml.id)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all bg-white border border-slate-200 hover:border-red-200" title="Hapus">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             
-            {((activeTab === 'articles' && articles.length === 0) || (activeTab === 'kegiatan' && kegiatan.length === 0) || (activeTab === 'mobile_libraries' && mobileLibraries.length === 0)) && (
+            {((activeTab === 'kegiatan' && kegiatan.length === 0) || (activeTab === 'mobile_libraries' && mobileLibraries.length === 0)) && (
               <div className="py-16 md:py-20 text-center flex flex-col items-center gap-4 bg-slate-50/20">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 md:w-8 md:h-8">
@@ -411,13 +596,53 @@ export default function AdminDashboard() {
                   </svg>
                 </div>
                 <p className="text-sm md:text-base text-slate-400 font-medium">
-                  Belum ada {activeTab === 'articles' ? 'artikel' : activeTab === 'kegiatan' ? 'kegiatan' : 'jadwal pusling'} yang terdaftar
+                  Belum ada {activeTab === 'kegiatan' ? 'kegiatan' : 'jadwal pusling'} yang terdaftar
                 </p>
               </div>
             )}
           </div>
         </main>
       </div>
+
+      {/* Modal Notification Component */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center">
+              {modal.type === 'success' && (
+                <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-4">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-8 h-8"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              )}
+              {modal.type === 'error' && (
+                <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-8 h-8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+              )}
+              {modal.type === 'confirm' && (
+                <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mb-4">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-8 h-8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+              )}
+              
+              <h3 className="text-xl font-bold text-slate-800 mb-2">{modal.title}</h3>
+              <p className="text-slate-500 text-sm mb-6 leading-relaxed">{modal.message}</p>
+              
+              <div className="flex w-full gap-3">
+                {modal.type === 'confirm' ? (
+                  <>
+                    <button onClick={() => setModal(prev => ({ ...prev, isOpen: false }))} className="flex-1 px-4 py-2.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button onClick={() => { setModal(prev => ({ ...prev, isOpen: false })); if(modal.onConfirm) modal.onConfirm(); }} className="flex-1 px-4 py-2.5 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all">Hapus Data</button>
+                  </>
+                ) : (
+                  <button onClick={() => setModal(prev => ({ ...prev, isOpen: false }))} className="w-full px-4 py-2.5 rounded-xl font-bold text-white bg-primary hover:bg-primary-light shadow-lg shadow-primary/30 transition-all">Tutup</button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
