@@ -20,6 +20,14 @@ export interface Kegiatan {
   imageUrl?: string;
   imageUrls?: string[];
   description: string;
+  namaInstansi?: string;
+  jumlahSnack?: number;
+  jumlahPeserta?: number;
+  namaNarasumber?: string;
+  timPelaksana?: string;
+  guru?: string;
+  jenisKelamin?: string;
+  usia?: string;
 }
 
 export const getKegiatan = (): Kegiatan[] => {

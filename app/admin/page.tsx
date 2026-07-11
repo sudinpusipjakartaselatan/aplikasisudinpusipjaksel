@@ -29,6 +29,14 @@ export default function AdminDashboard() {
   const [cropImageSrc, setCropImageSrc] = useState('');
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [kegiatanDescription, setKegiatanDescription] = useState('');
+  const [kegiatanNamaInstansi, setKegiatanNamaInstansi] = useState('');
+  const [kegiatanJumlahSnack, setKegiatanJumlahSnack] = useState('');
+  const [kegiatanJumlahPeserta, setKegiatanJumlahPeserta] = useState('');
+  const [kegiatanNamaNarasumber, setKegiatanNamaNarasumber] = useState('');
+  const [kegiatanTimPelaksana, setKegiatanTimPelaksana] = useState('');
+  const [kegiatanGuru, setKegiatanGuru] = useState('');
+  const [kegiatanJenisKelamin, setKegiatanJenisKelamin] = useState('');
+  const [kegiatanUsia, setKegiatanUsia] = useState('');
 
   // Mobile Library Form State
   const [mlTitle, setMlTitle] = useState('');
@@ -106,7 +114,7 @@ export default function AdminDashboard() {
     }
 
     const mainImageUrl = parsedUrls.length > 0 ? parsedUrls[0] : '';
-    const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription };
+    const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription, namaInstansi: kegiatanNamaInstansi, jumlahSnack: kegiatanJumlahSnack ? Number(kegiatanJumlahSnack) : undefined, jumlahPeserta: kegiatanJumlahPeserta ? Number(kegiatanJumlahPeserta) : undefined, namaNarasumber: kegiatanNamaNarasumber, timPelaksana: kegiatanTimPelaksana, guru: kegiatanGuru, jenisKelamin: kegiatanJenisKelamin, usia: kegiatanUsia };
     try {
       const res = await fetch(editingId ? `/api/kegiatan/${editingId}` : '/api/kegiatan', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kegiatanData) });
       if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); } else alert('Gagal menyimpan kegiatan');
@@ -124,7 +132,7 @@ export default function AdminDashboard() {
   };
 
   const handleEditKegiatan = (kegiatan: Kegiatan) => {
-    setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
+    setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setKegiatanNamaInstansi(kegiatan.namaInstansi || ''); setKegiatanJumlahSnack(kegiatan.jumlahSnack ? String(kegiatan.jumlahSnack) : ''); setKegiatanJumlahPeserta(kegiatan.jumlahPeserta ? String(kegiatan.jumlahPeserta) : ''); setKegiatanNamaNarasumber(kegiatan.namaNarasumber || ''); setKegiatanTimPelaksana(kegiatan.timPelaksana || ''); setKegiatanGuru(kegiatan.guru || ''); setKegiatanJenisKelamin(kegiatan.jenisKelamin || ''); setKegiatanUsia(kegiatan.usia || ''); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEditMobileLib = (ml: MobileLibrary) => {
@@ -146,7 +154,7 @@ export default function AdminDashboard() {
   const resetForm = () => {
     setEditingId(null);
     if (activeTab === 'kegiatan') {
-      setKegiatanTitle(''); setKegiatanDate(''); setKegiatanTime(''); setKegiatanLocation(''); setKegiatanImageUrls(''); setKegiatanFiles([]); setUploadMethod('url'); setKegiatanDescription(''); setCropImageSrc(''); setIsCropModalOpen(false);
+      setKegiatanTitle(''); setKegiatanDate(''); setKegiatanTime(''); setKegiatanLocation(''); setKegiatanImageUrls(''); setKegiatanFiles([]); setUploadMethod('url'); setKegiatanDescription(''); setCropImageSrc(''); setIsCropModalOpen(false); setKegiatanNamaInstansi(''); setKegiatanJumlahSnack(''); setKegiatanJumlahPeserta(''); setKegiatanNamaNarasumber(''); setKegiatanTimPelaksana(''); setKegiatanGuru(''); setKegiatanJenisKelamin(''); setKegiatanUsia('');
     } else {
       setMlTitle(''); setMlDate(''); setMlTime(''); setMlLocation(''); setMlImageUrl(''); setMlDescription('');
     }
@@ -294,6 +302,21 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 pt-6 border-t border-slate-100">
+                  <div className="col-span-1 md:col-span-2"><h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Informasi Tambahan (Arsip Internal - Opsional)</h4></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Nama Instansi</label><input type="text" value={kegiatanNamaInstansi} onChange={(e) => setKegiatanNamaInstansi(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: SD Negeri 01..." /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Nama Narasumber</label><input type="text" value={kegiatanNamaNarasumber} onChange={(e) => setKegiatanNamaNarasumber(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Contoh: Bapak Ahmad" /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Tim Pelaksana</label><input type="text" value={kegiatanTimPelaksana} onChange={(e) => setKegiatanTimPelaksana(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Tim pelaksana..." /></div>
+                  <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Guru Pendamping</label><input type="text" value={kegiatanGuru} onChange={(e) => setKegiatanGuru(e.target.value)} className="w-full px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Nama Guru..." /></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Jumlah Peserta</label><input type="number" value={kegiatanJumlahPeserta} onChange={(e) => setKegiatanJumlahPeserta(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="0" min="0" /></div>
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Jumlah Snack</label><input type="number" value={kegiatanJumlahSnack} onChange={(e) => setKegiatanJumlahSnack(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="0" min="0" /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">L/P</label><input type="text" value={kegiatanJenisKelamin} onChange={(e) => setKegiatanJenisKelamin(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="L/P" /></div>
+                    <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Usia</label><input type="text" value={kegiatanUsia} onChange={(e) => setKegiatanUsia(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Misal: 10-12 Tahun" /></div>
+                  </div>
+                </div>
                 <div className="flex gap-4 pt-4"><button type="submit" disabled={isSubmitting} className={`flex-1 py-4 md:py-5 rounded-2xl font-extrabold text-white transition-all shadow-lg text-sm md:text-base flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-light hover:-translate-y-1 active:translate-y-0 shadow-primary/20'}`}>{isSubmitting ? <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses Data...</> : (editingId ? 'Simpan Perubahan' : 'Publikasikan Kegiatan')}</button></div>
               </form>
               {isCropModalOpen && cropImageSrc && (
@@ -362,7 +385,7 @@ export default function AdminDashboard() {
                   {activeTab === 'kegiatan' && kegiatan.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex items-center gap-3 md:gap-4"><div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-inner flex items-center justify-center">{item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>}</div><div className="min-w-0"><div className="font-bold text-primary truncate max-w-[150px] sm:max-w-xs md:max-w-sm text-sm md:text-base group-hover:text-primary-light transition-colors">{item.title}</div></div></div></td>
-                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{item.location}</span></div></td>
+                      <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex flex-col gap-1"><span className="text-xs text-slate-500 font-bold truncate max-w-[150px]">{item.location}</span>{item.namaInstansi && <span className="text-[10px] text-slate-400 font-medium truncate max-w-[150px]">Instansi: {item.namaInstansi}</span>}</div></td>
                       <td className="px-6 md:px-8 py-4 md:py-6 text-xs md:text-sm text-slate-500 font-medium"><div className="flex flex-col gap-0.5"><span className="text-slate-700 font-bold">{item.date}</span><span>{item.time}</span></div></td>
                       <td className="px-6 md:px-8 py-4 md:py-6"><div className="flex justify-end gap-2"><button onClick={() => handleEditKegiatan(item)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-primary hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button><button onClick={() => handleDeleteKegiatan(item.id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-slate-400 hover:bg-red-500 hover:text-white transition-all bg-white border border-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button></div></td>
                     </tr>
