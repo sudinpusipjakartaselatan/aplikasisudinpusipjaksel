@@ -4,9 +4,9 @@ import { cookies } from 'next/headers';
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
-  const session = cookieStore.get('session');
+  const session = cookieStore.get('admin_session');
   
-  if (!session || session.value !== 'authenticated') {
+  if (!session || session.value !== 'true') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -27,9 +27,9 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
-  const session = cookieStore.get('session');
+  const session = cookieStore.get('admin_session');
   
-  if (!session || session.value !== 'authenticated') {
+  if (!session || session.value !== 'true') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

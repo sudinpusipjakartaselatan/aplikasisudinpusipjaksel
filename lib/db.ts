@@ -26,12 +26,29 @@ export interface Kegiatan {
 
 export interface MobileLibrary {
   id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  imageUrl: string;
-  description: string;
+  petugas?: string;
+  noPolisi?: string;
+  hari?: string;
+  tanggal?: string; // Replaces date
+  jamLayanan?: string; // Replaces time
+  kecamatan?: string;
+  kelurahan?: string;
+  namaLokasi?: string; // Replaces location or title
+  alamatTelepon?: string;
+  jarakKeLokasi1?: string | number;
+  jarakLokasi1Ke2?: string | number;
+  jarakKembali?: string | number;
+  totalJarak?: string | number;
+  namaPimpinan?: string;
+  namaPIC?: string;
+  imageUrl?: string;
+  
+  // Keep legacy for existing data
+  title?: string;
+  date?: string;
+  time?: string;
+  location?: string;
+  description?: string;
 }
 
 // Check if Upstash Redis credentials exist in environment
@@ -187,6 +204,17 @@ export const addMobileLibrary = async (library: Omit<MobileLibrary, 'id'>): Prom
   libraries.unshift(newLibrary);
   const success = await saveMobileLibraries(libraries);
   return success ? newLibrary : null;
+};
+
+export const addBulkMobileLibraries = async (libraryItems: Omit<MobileLibrary, 'id'>[]): Promise<MobileLibrary[] | null> => {
+  const libraries = await getMobileLibraries();
+  const newItems = libraryItems.map((item, index) => ({
+    ...item,
+    id: (Date.now() + index).toString(),
+  }));
+  libraries.unshift(...newItems);
+  const success = await saveMobileLibraries(libraries);
+  return success ? newItems : null;
 };
 
 export const updateMobileLibrary = async (id: string, updatedData: Partial<MobileLibrary>): Promise<MobileLibrary | null> => {

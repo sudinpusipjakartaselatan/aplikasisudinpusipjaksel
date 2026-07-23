@@ -53,12 +53,12 @@ export default async function PuslingPage({
                 <MobileLibraryCard 
                   key={item.id}
                   id={item.id}
-                  title={item.title}
-                  date={item.date}
-                  time={item.time}
-                  location={item.location}
+                  title={item.namaLokasi || item.title || 'Lokasi Belum Ditentukan'}
+                  date={item.tanggal || item.date || '-'}
+                  hari={item.hari}
+                  time={item.jamLayanan || item.time || ''}
+                  location={item.kelurahan || item.location || '-'}
                   imageUrl={item.imageUrl}
-                  description={item.description}
                 />
               ))}
             </div>

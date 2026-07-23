@@ -4,13 +4,16 @@ interface MobileLibraryCardProps {
   id: string;
   title: string;
   date: string;
-  time: string;
+  hari?: string;
   location: string;
+  time?: string;
   imageUrl?: string;
-  description: string;
 }
 
-const MobileLibraryCard = ({ title, date, time, location, imageUrl, description }: MobileLibraryCardProps) => {
+const MobileLibraryCard = ({ title, date, hari, location, time, imageUrl }: MobileLibraryCardProps) => {
+  // If 'hari' is not provided directly, we try to extract it from 'date' if formatted like "Senin, 15 Okt..."
+  // But ideally, 'hari' is passed from the DB.
+  
   return (
     <div className="bg-card rounded-2xl overflow-hidden border border-border hover-lift premium-shadow flex flex-col h-full group relative">
       {/* Top Image Section */}
@@ -32,27 +35,40 @@ const MobileLibraryCard = ({ title, date, time, location, imageUrl, description 
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-80"></div>
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-          <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-full text-[10px] font-bold text-primary uppercase tracking-wider shadow-sm flex items-center gap-1">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            {time}
-          </span>
-        </div>
+        {time && (
+          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+            <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-full text-[10px] font-bold text-primary uppercase tracking-wider shadow-sm flex items-center gap-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+              {time}
+            </span>
+          </div>
+        )}
       </div>
       
       {/* Content Section */}
       <div className="p-6 flex flex-col flex-grow bg-white dark:bg-slate-900 relative">
-        {/* Floating Date Badge */}
-        <div className="absolute -top-12 right-6 bg-secondary text-primary w-14 h-14 rounded-2xl flex flex-col items-center justify-center shadow-lg transform rotate-3 group-hover:rotate-0 transition-transform duration-300 border-2 border-white dark:border-slate-800">
-          <span className="text-xl font-black leading-none">{date.split(' ')[0]}</span>
-          <span className="text-[9px] font-bold uppercase tracking-wider">{date.split(' ')[1]?.substring(0,3)}</span>
-        </div>
-
-        <h3 className="text-lg md:text-xl font-bold mb-4 text-heading-text line-clamp-2 leading-tight pr-10">
+        <h3 className="text-lg md:text-xl font-bold mb-4 text-heading-text line-clamp-2 leading-tight">
           {title}
         </h3>
         
-        <div className="space-y-4 mb-6 flex-grow">
+        <div className="space-y-4 mb-2 flex-grow">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 shrink-0 mt-0.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jadwal</p>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 leading-snug">
+                {hari ? `${hari}, ` : ''}{date}
+              </p>
+            </div>
+          </div>
+          
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
@@ -61,17 +77,12 @@ const MobileLibraryCard = ({ title, date, time, location, imageUrl, description 
               </svg>
             </div>
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Lokasi Pusling</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Kelurahan</p>
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 leading-snug">{location}</p>
             </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-auto">
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-            {description}
-          </p>
-        </div>
       </div>
     </div>
   );

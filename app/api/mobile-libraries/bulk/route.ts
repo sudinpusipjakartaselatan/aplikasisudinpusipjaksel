@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getMobileLibraries, addMobileLibrary } from '@/lib/db';
+import { addBulkMobileLibraries } from '@/lib/db';
 import { cookies } from 'next/headers';
-
-export async function GET() {
-  const libraries = await getMobileLibraries();
-  return NextResponse.json(libraries);
-}
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -17,12 +12,17 @@ export async function POST(request: Request) {
 
   try {
     const data = await request.json();
-    const newLibrary = await addMobileLibrary(data);
     
-    if (newLibrary) {
-      return NextResponse.json({ success: true, library: newLibrary });
+    if (!Array.isArray(data)) {
+      return NextResponse.json({ error: 'Data must be an array' }, { status: 400 });
+    }
+
+    const newItems = await addBulkMobileLibraries(data);
+    
+    if (newItems) {
+      return NextResponse.json({ success: true, count: newItems.length });
     } else {
-      return NextResponse.json({ error: 'Failed to add mobile library' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to add bulk mobile libraries' }, { status: 500 });
     }
   } catch (error) {
     return NextResponse.json({ error: 'Invalid data' }, { status: 400 });

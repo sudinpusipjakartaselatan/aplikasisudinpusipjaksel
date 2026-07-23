@@ -82,12 +82,12 @@ export default async function Home() {
                 <MobileLibraryCard 
                   key={library.id}
                   id={library.id}
-                  title={library.title}
-                  date={library.date}
-                  time={library.time}
-                  location={library.location}
+                  title={library.namaLokasi || library.title || 'Lokasi Belum Ditentukan'}
+                  date={library.tanggal || library.date || '-'}
+                  hari={library.hari}
+                  time={library.jamLayanan || library.time || ''}
+                  location={library.kelurahan || library.location || '-'}
                   imageUrl={library.imageUrl}
-                  description={library.description}
                 />
               ))
             ) : (
