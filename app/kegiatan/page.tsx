@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getKegiatan } from "@/lib/db";
+import { sortKegiatanByStatusAndDate } from "@/utils/dateHelper";
 import KegiatanCard from "@/components/KegiatanCard";
 import Pagination from "@/components/Pagination";
 
@@ -16,7 +17,8 @@ export default async function KegiatanPage({
   const currentPage = isNaN(page) || page < 1 ? 1 : page;
   
   const ITEMS_PER_PAGE = 6;
-  const allKegiatan = await getKegiatan();
+  const allKegiatanRaw = await getKegiatan();
+  const allKegiatan = sortKegiatanByStatusAndDate(allKegiatanRaw);
   const totalPages = Math.ceil(allKegiatan.length / ITEMS_PER_PAGE);
   
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -61,6 +63,8 @@ export default async function KegiatanPage({
                   time={item.time}
                   location={item.location}
                   imageUrl={item.imageUrl}
+                  views={item.views}
+                  status={item.status}
                 />
               ))}
             </div>

@@ -22,6 +22,8 @@ export interface Kegiatan {
   guru?: string;
   jenisKelamin?: string;
   usia?: string;
+  views?: number;
+  status?: 'auto' | 'upcoming' | 'ongoing' | 'completed';
 }
 
 export interface MobileLibrary {
@@ -172,6 +174,22 @@ export const deleteKegiatan = async (id: string): Promise<boolean> => {
   if (filtered.length === kegiatan.length) return false;
   
   return await saveKegiatan(filtered);
+};
+
+export const incrementKegiatanViews = async (id: string): Promise<number | null> => {
+  const kegiatan = await getKegiatan();
+  const cleanId = decodeURIComponent(id).trim();
+  const index = kegiatan.findIndex(e => String(e.id).trim() === cleanId);
+  if (index === -1) return null;
+  
+  const currentViews = typeof kegiatan[index].views === 'number' ? kegiatan[index].views : 0;
+  const newViews = currentViews + 1;
+  kegiatan[index] = {
+    ...kegiatan[index],
+    views: newViews,
+  };
+  await saveKegiatan(kegiatan);
+  return newViews;
 };
 
 // ==========================================

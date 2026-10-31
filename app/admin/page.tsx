@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Kegiatan, MobileLibrary } from '@/lib/db';
+import { getActivityStatus } from '@/utils/dateHelper';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ImageCropModal from '@/components/ImageCropModal';
@@ -56,6 +57,8 @@ export default function AdminDashboard() {
   const [kegiatanGuru, setKegiatanGuru] = useState('');
   const [kegiatanJenisKelamin, setKegiatanJenisKelamin] = useState('');
   const [kegiatanUsia, setKegiatanUsia] = useState('');
+  const [kegiatanViews, setKegiatanViews] = useState<number>(0);
+  const [kegiatanStatus, setKegiatanStatus] = useState<'auto' | 'upcoming' | 'ongoing' | 'completed'>('auto');
 
   // Mobile Library Form State
   const [mlPetugas, setMlPetugas] = useState('');
@@ -118,6 +121,8 @@ export default function AdminDashboard() {
         usia: row['Usia'] ? String(row['Usia']) : '',
         jumlahPeserta: row['Peserta'] ? String(row['Peserta']) : '',
         jumlahSnack: row['Snack'] ? Number(row['Snack']) : undefined,
+        views: row['Views'] !== undefined && row['Views'] !== '' ? Number(row['Views']) : 0,
+        status: (['auto', 'upcoming', 'ongoing', 'completed'].includes(row['Status']) ? row['Status'] : 'auto') as any,
       }));
       
       const res = await fetch('/api/kegiatan/bulk', {
@@ -162,7 +167,9 @@ export default function AdminDashboard() {
       'Peserta': item.jumlahPeserta || '',
       'Snack': item.jumlahSnack || '',
       'L/P': item.jenisKelamin || '',
-      'Usia': item.usia || ''
+      'Usia': item.usia || '',
+      'Views': item.views ?? 0,
+      'Status': item.status || 'auto'
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -328,7 +335,25 @@ export default function AdminDashboard() {
       }
   
       const mainImageUrl = parsedUrls.length > 0 ? parsedUrls[0] : '';
-      const kegiatanData = { title: kegiatanTitle, date: kegiatanDate, time: kegiatanTime, location: kegiatanLocation, imageUrl: mainImageUrl, imageUrls: parsedUrls, description: kegiatanDescription, namaInstansi: kegiatanNamaInstansi, jumlahSnack: kegiatanJumlahSnack ? Number(kegiatanJumlahSnack) : undefined, jumlahPeserta: kegiatanJumlahPeserta, namaNarasumber: kegiatanNamaNarasumber, timPelaksana: kegiatanTimPelaksana, guru: kegiatanGuru, jenisKelamin: kegiatanJenisKelamin, usia: kegiatanUsia };
+      const kegiatanData = { 
+        title: kegiatanTitle, 
+        date: kegiatanDate, 
+        time: kegiatanTime, 
+        location: kegiatanLocation, 
+        imageUrl: mainImageUrl, 
+        imageUrls: parsedUrls, 
+        description: kegiatanDescription, 
+        namaInstansi: kegiatanNamaInstansi, 
+        jumlahSnack: kegiatanJumlahSnack ? Number(kegiatanJumlahSnack) : undefined, 
+        jumlahPeserta: kegiatanJumlahPeserta, 
+        namaNarasumber: kegiatanNamaNarasumber, 
+        timPelaksana: kegiatanTimPelaksana, 
+        guru: kegiatanGuru, 
+        jenisKelamin: kegiatanJenisKelamin, 
+        usia: kegiatanUsia,
+        views: Number(kegiatanViews) || 0,
+        status: kegiatanStatus
+      };
       try {
         const res = await fetch(editingId ? `/api/kegiatan/${editingId}` : '/api/kegiatan', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kegiatanData) });
         if (res.ok) { setShowAddForm(false); resetForm(); fetchData(); showAlert('success', 'Berhasil', 'Kegiatan berhasil disimpan'); } else showAlert('error', 'Gagal', 'Gagal menyimpan kegiatan');
@@ -351,7 +376,25 @@ export default function AdminDashboard() {
     };
 
   const handleEditKegiatan = (kegiatan: Kegiatan) => {
-    setEditingId(kegiatan.id); setKegiatanTitle(kegiatan.title); setKegiatanDate(kegiatan.date); setKegiatanTime(kegiatan.time); setKegiatanLocation(kegiatan.location); setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); setKegiatanDescription(kegiatan.description); setKegiatanNamaInstansi(kegiatan.namaInstansi || ''); setKegiatanJumlahSnack(kegiatan.jumlahSnack ? String(kegiatan.jumlahSnack) : ''); setKegiatanJumlahPeserta(kegiatan.jumlahPeserta ? String(kegiatan.jumlahPeserta) : ''); setKegiatanNamaNarasumber(kegiatan.namaNarasumber || ''); setKegiatanTimPelaksana(kegiatan.timPelaksana || ''); setKegiatanGuru(kegiatan.guru || ''); setKegiatanJenisKelamin(kegiatan.jenisKelamin || ''); setKegiatanUsia(kegiatan.usia || ''); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' });
+    setEditingId(kegiatan.id); 
+    setKegiatanTitle(kegiatan.title); 
+    setKegiatanDate(kegiatan.date); 
+    setKegiatanTime(kegiatan.time); 
+    setKegiatanLocation(kegiatan.location); 
+    setKegiatanImageUrls(kegiatan.imageUrls ? kegiatan.imageUrls.join('\n') : (kegiatan.imageUrl || '')); 
+    setKegiatanDescription(kegiatan.description); 
+    setKegiatanNamaInstansi(kegiatan.namaInstansi || ''); 
+    setKegiatanJumlahSnack(kegiatan.jumlahSnack ? String(kegiatan.jumlahSnack) : ''); 
+    setKegiatanJumlahPeserta(kegiatan.jumlahPeserta ? String(kegiatan.jumlahPeserta) : ''); 
+    setKegiatanNamaNarasumber(kegiatan.namaNarasumber || ''); 
+    setKegiatanTimPelaksana(kegiatan.timPelaksana || ''); 
+    setKegiatanGuru(kegiatan.guru || ''); 
+    setKegiatanJenisKelamin(kegiatan.jenisKelamin || ''); 
+    setKegiatanUsia(kegiatan.usia || '');
+    setKegiatanViews(kegiatan.views ?? 0);
+    setKegiatanStatus(kegiatan.status || 'auto');
+    setShowAddForm(true); 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEditMobileLib = (ml: MobileLibrary) => {
@@ -390,7 +433,26 @@ export default function AdminDashboard() {
   const resetForm = () => {
     setEditingId(null);
     if (activeTab === 'kegiatan') {
-      setKegiatanTitle(''); setKegiatanDate(''); setKegiatanTime(''); setKegiatanLocation(''); setKegiatanImageUrls(''); setKegiatanFiles([]); setUploadMethod('url'); setKegiatanDescription(''); setCropImageSrc(''); setIsCropModalOpen(false); setKegiatanNamaInstansi(''); setKegiatanJumlahSnack(''); setKegiatanJumlahPeserta(''); setKegiatanNamaNarasumber(''); setKegiatanTimPelaksana(''); setKegiatanGuru(''); setKegiatanJenisKelamin(''); setKegiatanUsia('');
+      setKegiatanTitle(''); 
+      setKegiatanDate(''); 
+      setKegiatanTime(''); 
+      setKegiatanLocation(''); 
+      setKegiatanImageUrls(''); 
+      setKegiatanFiles([]); 
+      setUploadMethod('url'); 
+      setKegiatanDescription(''); 
+      setCropImageSrc(''); 
+      setIsCropModalOpen(false); 
+      setKegiatanNamaInstansi(''); 
+      setKegiatanJumlahSnack(''); 
+      setKegiatanJumlahPeserta(''); 
+      setKegiatanNamaNarasumber(''); 
+      setKegiatanTimPelaksana(''); 
+      setKegiatanGuru(''); 
+      setKegiatanJenisKelamin(''); 
+      setKegiatanUsia('');
+      setKegiatanViews(0);
+      setKegiatanStatus('auto');
     } else {
       setMlPetugas(''); setMlNoPolisi(''); setMlHari(''); setMlTanggal(''); setMlJamLayanan(''); setMlKecamatan(''); setMlKelurahan(''); setMlNamaLokasi(''); setMlAlamatTelepon(''); setMlJarakKeLokasi1(''); setMlJarakLokasi1Ke2(''); setMlJarakKembali(''); setMlTotalJarak(''); setMlNamaPimpinan(''); setMlNamaPIC(''); setMlImageUrl('');
     }
@@ -577,6 +639,65 @@ export default function AdminDashboard() {
                     <div><label className="block text-sm font-bold text-slate-700 mb-2.5">Usia</label><input type="text" value={kegiatanUsia} onChange={(e) => setKegiatanUsia(e.target.value)} className="w-full px-4 py-3 md:py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-600 font-medium" placeholder="Misal: 10-12 Tahun" /></div>
                   </div>
                 </div>
+
+                {/* Pengaturan Views & Status Kegiatan */}
+                <div className="pt-6 border-t border-slate-100">
+                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-primary">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Pengaturan Tayangan & Status Kegiatan
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/80 p-5 md:p-6 rounded-2xl border border-slate-200/60">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span>Jumlah Pelihat Postingan (Views)</span>
+                        <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Otomatis & Editable</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          value={kegiatanViews}
+                          onChange={(e) => setKegiatanViews(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full pl-11 pr-4 py-3 md:py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-700 font-semibold bg-white"
+                          placeholder="0"
+                        />
+                      </div>
+                      <p className="text-xs text-slate-500 mt-2">
+                        Views bertambah otomatis saat pengunjung membuka postingan, atau tentukan angka awal dari sini.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span>Status Kegiatan & Countdown</span>
+                        <span className="text-[11px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">Coming Soon / Live</span>
+                      </label>
+                      <select
+                        value={kegiatanStatus}
+                        onChange={(e) => setKegiatanStatus(e.target.value as any)}
+                        className="w-full px-4 py-3 md:py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-700 font-semibold bg-white cursor-pointer"
+                      >
+                        <option value="auto">🔄 Otomatis (Dideteksi dari Tanggal & Jam)</option>
+                        <option value="upcoming">🚀 Akan Datang / Coming Soon (Prioritas di Atas)</option>
+                        <option value="ongoing">🔴 Sedang Berlangsung (Live)</option>
+                        <option value="completed">✓ Selesai Dilaksanakan</option>
+                      </select>
+                      <p className="text-xs text-slate-500 mt-2">
+                        Kegiatan yang berstatus <strong>Akan Datang</strong> otomatis menampilkan hitung mundur (countdown) dan diprioritaskan di awal halaman.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex gap-4 pt-4"><button type="submit" disabled={isSubmitting} className={`flex-1 py-4 md:py-5 rounded-2xl font-extrabold text-white transition-all shadow-lg text-sm md:text-base flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-light hover:-translate-y-1 active:translate-y-0 shadow-primary/20'}`}>{isSubmitting ? <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses Data...</> : (editingId ? 'Simpan Perubahan' : 'Publikasikan Kegiatan')}</button></div>
               </form>
               {isCropModalOpen && cropImageSrc && (
@@ -645,7 +766,8 @@ export default function AdminDashboard() {
                     <tr>
                       <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Detail Konten</th>
                       <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Lokasi</th>
-                      <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Jadwal</th>
+                      <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Jadwal & Status</th>
+                      <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide">Pelihat (Views)</th>
                       <th className="px-5 md:px-6 py-4 text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wide text-right">Kelola</th>
                     </tr>
                   ) : (
@@ -658,50 +780,84 @@ export default function AdminDashboard() {
                   )}
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {activeTab === 'kegiatan' && kegiatan.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
-                      <td className="px-5 md:px-6 py-4 md:py-5">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm flex items-center justify-center border border-slate-200">
-                            {item.imageUrl ? (
-                              <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                            )}
+                  {activeTab === 'kegiatan' && kegiatan.map((item) => {
+                    const effectiveStatus = getActivityStatus(item.date, item.time, item.status);
+                    return (
+                      <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                        <td className="px-5 md:px-6 py-4 md:py-5">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm flex items-center justify-center border border-slate-200">
+                              {item.imageUrl ? (
+                                <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-slate-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                              )}
+                            </div>
+                            <div className="flex flex-col min-w-0 pt-0.5">
+                              <span className="font-bold text-slate-800 text-sm md:text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors">{item.title}</span>
+                              {item.description && <span className="text-xs text-slate-500 mt-1 line-clamp-1">{item.description}</span>}
+                            </div>
                           </div>
-                          <div className="flex flex-col min-w-0 pt-0.5">
-                            <span className="font-bold text-slate-800 text-sm md:text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors">{item.title}</span>
-                            {item.description && <span className="text-xs text-slate-500 mt-1 line-clamp-1">{item.description}</span>}
+                        </td>
+                        <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-semibold text-slate-700 whitespace-pre-wrap">{item.location}</span>
+                            {item.namaInstansi && <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md w-fit">Instansi: {item.namaInstansi}</span>}
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm font-semibold text-slate-700 whitespace-pre-wrap">{item.location}</span>
-                          {item.namaInstansi && <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md w-fit">Instansi: {item.namaInstansi}</span>}
-                        </div>
-                      </td>
-                      <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm font-bold text-slate-800">{item.date}</span>
-                          <span className="text-xs text-slate-500 flex items-center gap-1">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            {item.time}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-5 md:px-6 py-4 md:py-5 align-middle text-right">
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleEditKegiatan(item)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-amber-100 hover:text-amber-600 transition-all bg-white border border-slate-200 hover:border-amber-200" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                          </button>
-                          <button onClick={() => handleDeleteKegiatan(item.id)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all bg-white border border-slate-200 hover:border-red-200" title="Hapus">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                          <div className="flex flex-col gap-1.5">
+                            <span className="text-sm font-bold text-slate-800">{item.date}</span>
+                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                              {item.time}
+                            </span>
+                            <div className="pt-1">
+                              {effectiveStatus === 'upcoming' && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm shadow-orange-500/20">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                  Akan Datang
+                                </span>
+                              )}
+                              {effectiveStatus === 'ongoing' && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-red-500 text-white shadow-sm shadow-red-500/20">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                  Berlangsung
+                                </span>
+                              )}
+                              {effectiveStatus === 'completed' && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                  ✓ Selesai
+                                </span>
+                              )}
+                              {item.status && item.status !== 'auto' && (
+                                <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">(manual: {item.status})</span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 md:px-6 py-4 md:py-5 align-top pt-5">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-slate-500">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                              <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <span>{(item.views || 0).toLocaleString('id-ID')} views</span>
+                          </div>
+                        </td>
+                        <td className="px-5 md:px-6 py-4 md:py-5 align-middle text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => handleEditKegiatan(item)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-amber-100 hover:text-amber-600 transition-all bg-white border border-slate-200 hover:border-amber-200" title="Edit">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                            </button>
+                            <button onClick={() => handleDeleteKegiatan(item.id)} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all bg-white border border-slate-200 hover:border-red-200" title="Hapus">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
 
                   {activeTab === 'mobile_libraries' && mobileLibraries.map((ml) => (
                     <tr key={ml.id} className="hover:bg-slate-50 transition-colors group">

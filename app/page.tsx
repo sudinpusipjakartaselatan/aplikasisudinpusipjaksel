@@ -2,13 +2,16 @@ import Hero from '@/components/Hero';
 import KegiatanCard from '@/components/KegiatanCard';
 import MobileLibraryCard from '@/components/MobileLibraryCard';
 import { getKegiatan, getMobileLibraries } from '@/lib/db';
+import { sortKegiatanByStatusAndDate } from '@/utils/dateHelper';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
-  const kegiatan = (await getKegiatan()).slice(0, 4); // Show only top 4 kegiatan
+  const allKegiatan = await getKegiatan();
+  const sortedKegiatan = sortKegiatanByStatusAndDate(allKegiatan);
+  const kegiatan = sortedKegiatan.slice(0, 4); // Show top 4 prioritised by upcoming/ongoing
   const mobileLibraries = (await getMobileLibraries()).slice(0, 4); // Show only top 4
 
 
@@ -47,6 +50,8 @@ export default async function Home() {
                   time={item.time}
                   location={item.location}
                   imageUrl={item.imageUrl}
+                  views={item.views}
+                  status={item.status}
                 />
               ))
             ) : (
