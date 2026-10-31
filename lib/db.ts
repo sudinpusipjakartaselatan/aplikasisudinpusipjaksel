@@ -127,7 +127,8 @@ export const saveKegiatan = async (kegiatan: Kegiatan[]): Promise<boolean> => {
 
 export const getKegiatanById = async (id: string): Promise<Kegiatan | undefined> => {
   const kegiatan = await getKegiatan();
-  return kegiatan.find(e => e.id === id);
+  const cleanId = decodeURIComponent(id).trim();
+  return kegiatan.find(e => String(e.id).trim() === cleanId);
 };
 
 export const addKegiatan = async (kegiatanItem: Omit<Kegiatan, 'id'>): Promise<Kegiatan | null> => {
@@ -154,10 +155,11 @@ export const addBulkKegiatan = async (kegiatanItems: Omit<Kegiatan, 'id'>[]): Pr
 
 export const updateKegiatan = async (id: string, updatedData: Partial<Kegiatan>): Promise<Kegiatan | null> => {
   const kegiatan = await getKegiatan();
-  const index = kegiatan.findIndex(e => e.id === id);
+  const cleanId = decodeURIComponent(id).trim();
+  const index = kegiatan.findIndex(e => String(e.id).trim() === cleanId);
   if (index === -1) return null;
   
-  const updatedKegiatan = { ...kegiatan[index], ...updatedData, id };
+  const updatedKegiatan = { ...kegiatan[index], ...updatedData, id: cleanId };
   kegiatan[index] = updatedKegiatan;
   const success = await saveKegiatan(kegiatan);
   return success ? updatedKegiatan : null;
@@ -165,7 +167,8 @@ export const updateKegiatan = async (id: string, updatedData: Partial<Kegiatan>)
 
 export const deleteKegiatan = async (id: string): Promise<boolean> => {
   const kegiatan = await getKegiatan();
-  const filtered = kegiatan.filter(e => e.id !== id);
+  const cleanId = decodeURIComponent(id).trim();
+  const filtered = kegiatan.filter(e => String(e.id).trim() !== cleanId);
   if (filtered.length === kegiatan.length) return false;
   
   return await saveKegiatan(filtered);
@@ -240,7 +243,8 @@ export const saveMobileLibraries = async (libraries: MobileLibrary[]): Promise<b
 
 export const getMobileLibraryById = async (id: string): Promise<MobileLibrary | undefined> => {
   const libraries = await getMobileLibraries();
-  return libraries.find(l => l.id === id);
+  const cleanId = decodeURIComponent(id).trim();
+  return libraries.find(l => String(l.id || '').trim() === cleanId);
 };
 
 export const addMobileLibrary = async (library: Omit<MobileLibrary, 'id'>): Promise<MobileLibrary | null> => {
@@ -267,10 +271,11 @@ export const addBulkMobileLibraries = async (libraryItems: Omit<MobileLibrary, '
 
 export const updateMobileLibrary = async (id: string, updatedData: Partial<MobileLibrary>): Promise<MobileLibrary | null> => {
   const libraries = await getMobileLibraries();
-  const index = libraries.findIndex(l => l.id === id);
+  const cleanId = decodeURIComponent(id).trim();
+  const index = libraries.findIndex(l => String(l.id || '').trim() === cleanId);
   if (index === -1) return null;
   
-  const updatedLibrary = { ...libraries[index], ...updatedData, id };
+  const updatedLibrary = { ...libraries[index], ...updatedData, id: cleanId };
   libraries[index] = updatedLibrary;
   const success = await saveMobileLibraries(libraries);
   return success ? updatedLibrary : null;
@@ -278,7 +283,8 @@ export const updateMobileLibrary = async (id: string, updatedData: Partial<Mobil
 
 export const deleteMobileLibrary = async (id: string): Promise<boolean> => {
   const libraries = await getMobileLibraries();
-  const filtered = libraries.filter(l => l.id !== id);
+  const cleanId = decodeURIComponent(id).trim();
+  const filtered = libraries.filter(l => String(l.id || '').trim() !== cleanId);
   if (filtered.length === libraries.length) return false;
   
   return await saveMobileLibraries(filtered);

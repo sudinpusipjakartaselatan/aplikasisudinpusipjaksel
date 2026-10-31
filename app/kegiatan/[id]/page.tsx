@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { getKegiatanById } from "@/lib/db";
 import KegiatanCarousel from "@/components/KegiatanCarousel";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function KegiatanDetailPage({
   params,
 }: {

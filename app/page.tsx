@@ -1,9 +1,11 @@
 import Hero from '@/components/Hero';
-import EventCard from '@/components/EventCard';
 import KegiatanCard from '@/components/KegiatanCard';
 import MobileLibraryCard from '@/components/MobileLibraryCard';
 import { getKegiatan, getMobileLibraries } from '@/lib/db';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function Home() {
   const kegiatan = (await getKegiatan()).slice(0, 4); // Show only top 4 kegiatan

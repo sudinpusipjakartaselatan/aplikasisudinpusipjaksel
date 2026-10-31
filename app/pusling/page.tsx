@@ -3,6 +3,9 @@ import { getMobileLibraries } from "@/lib/db";
 import MobileLibraryCard from "@/components/MobileLibraryCard";
 import Pagination from "@/components/Pagination";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function PuslingPage({
   searchParams,
 }: {
