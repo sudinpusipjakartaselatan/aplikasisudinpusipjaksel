@@ -130,7 +130,8 @@ export default function AdminDashboard() {
         showAlert('success', 'Berhasil', `Berhasil mengimpor ${mappedData.length} kegiatan`);
         fetchData();
       } else {
-        showAlert('error', 'Gagal', 'Gagal mengimpor data');
+        const errData = await res.json().catch(() => ({}));
+        showAlert('error', 'Gagal', errData.error || 'Gagal mengimpor data');
       }
     } catch (error) {
       console.error(error);
@@ -217,7 +218,8 @@ export default function AdminDashboard() {
         showAlert('success', 'Berhasil', `Berhasil mengimpor ${mappedData.length} data pusling`);
         fetchData();
       } else {
-        showAlert('error', 'Gagal', 'Gagal mengimpor data pusling');
+        const errData = await res.json().catch(() => ({}));
+        showAlert('error', 'Gagal', errData.error || 'Gagal mengimpor data pusling');
       }
     } catch (error) {
       console.error(error);

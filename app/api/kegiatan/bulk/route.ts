@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     } else {
       return NextResponse.json({ error: 'Failed to add bulk kegiatan' }, { status: 500 });
     }
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || 'Invalid data' }, { status: 400 });
   }
 }
